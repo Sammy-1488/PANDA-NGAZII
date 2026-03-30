@@ -1,0 +1,1 @@
+# Reports app - models for generated reports if needed

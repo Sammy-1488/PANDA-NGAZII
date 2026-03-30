@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h2 class="text-2xl font-bold mb-4">Qualification Status</h2>
+{% if feedback %}
+<div class="bg-white p-4 rounded-lg shadow-md">
+    <p><strong>Status:</strong> {{ feedback.qualification_status }}</p>
+    <p><strong>Comments:</strong> {{ feedback.comments }}</p>
+    <p><strong>Reviewed by:</strong> {{ feedback.reviewed_by.username }}</p>
+    <p><strong>Reviewed at:</strong> {{ feedback.reviewed_at }}</p>
+</div>
+{% else %}
+<p>No feedback available yet.</p>
+{% endif %}
+{% endblock %}

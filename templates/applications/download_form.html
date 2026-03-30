@@ -1,0 +1,93 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<style>
+  .dl-hero {
+    background: linear-gradient(135deg, #1e3a8a 0%, #2563eb 100%);
+    border-radius: 16px;
+    padding: 2.5rem;
+    color: white;
+    text-align: center;
+    margin-bottom: 2rem;
+  }
+  .dl-hero h2 { font-size: 1.8rem; font-weight: 800; margin: 0 0 0.5rem; }
+  .dl-hero p  { opacity: 0.85; font-size: 1rem; margin: 0; }
+
+  .dl-card {
+    max-width: 540px;
+    margin: 0 auto 2rem;
+    background: #fff;
+    border-radius: 14px;
+    border: 1.5px solid #e5e7eb;
+    padding: 2rem;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+  }
+  .dl-card h3 { font-size: 1.1rem; font-weight: 700; color: #1f2937; margin: 0 0 0.5rem; }
+  .dl-card .meta { font-size: 0.82rem; color: #6b7280; margin-bottom: 1.5rem; }
+  .dl-btn {
+    display: inline-flex; align-items: center; gap: 0.5rem;
+    background: #1e40af; color: #fff;
+    padding: 0.75rem 1.75rem; border-radius: 10px;
+    font-weight: 700; font-size: 1rem;
+    text-decoration: none; transition: background 0.15s, transform 0.15s;
+  }
+  .dl-btn:hover { background: #1e3a8a; transform: translateY(-2px); color: #fff; text-decoration: none; }
+
+  .steps-box {
+    max-width: 540px;
+    margin: 0 auto;
+    background: #f0f9ff;
+    border: 1.5px solid #bae6fd;
+    border-radius: 12px;
+    padding: 1.5rem;
+  }
+  .steps-box h4 { font-size: 0.95rem; font-weight: 700; color: #0369a1; margin: 0 0 1rem; }
+  .steps-box ol { margin: 0; padding-left: 1.4rem; }
+  .steps-box li { font-size: 0.875rem; color: #374151; margin-bottom: 0.5rem; }
+
+  .no-form {
+    max-width: 540px; margin: 0 auto;
+    background: #fef2f2; border: 1.5px solid #fecaca;
+    border-radius: 12px; padding: 1.5rem; text-align: center;
+    color: #991b1b;
+  }
+</style>
+
+<div class="dl-hero">
+  <h2>📄 Application Form</h2>
+  <p>Download the official blank application form provided by the bursary committee</p>
+</div>
+
+{% if form_template %}
+  <div class="dl-card">
+    <h3>{{ form_template.title }}</h3>
+    <p class="meta">📅 Published: {{ form_template.uploaded_at|date:"d M Y" }}</p>
+    <a href="{% url 'applications:serve_form_file' form_template.pk %}" class="dl-btn">
+      ⬇ Download Form
+    </a>
+  </div>
+
+  <div class="steps-box">
+    <h4>📋 How to apply:</h4>
+    <ol>
+      <li>Download the form above and print or fill it digitally.</li>
+      <li>Complete all sections accurately.</li>
+      <li>Gather supporting documents (school ID, fee statement, guardian ID, etc.).</li>
+      <li>Go to <strong>Submit Application</strong> to upload the filled form.</li>
+      <li>Track your progress in the <strong>Application Status</strong> module.</li>
+    </ol>
+  </div>
+{% else %}
+  <div class="no-form">
+    <p style="font-size:1.5rem; margin-bottom:0.5rem;">🔔</p>
+    <strong>No form available yet.</strong>
+    <p style="margin: 0.5rem 0 0; font-size:0.875rem;">
+      The administrator has not yet uploaded the application form. Please check back later or contact the bursary office.
+    </p>
+  </div>
+{% endif %}
+
+<div style="text-align:center; margin-top:2rem;">
+  <a href="{% url 'home' %}" style="color:#6b7280; font-size:0.9rem; text-decoration:none;">← Back to Dashboard</a>
+</div>
+{% endblock %}

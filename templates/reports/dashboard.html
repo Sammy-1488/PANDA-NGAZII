@@ -1,0 +1,21 @@
+{% extends 'base.html' %} {% block content %}
+<h2 class="text-2xl font-bold mb-4">Administrative Dashboard</h2>
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+  <div class="bg-white p-4 rounded-lg shadow-md">
+    <h3 class="text-lg font-semibold">Total Applications</h3>
+    <p class="text-2xl">{{ total_applications }}</p>
+  </div>
+  <div class="bg-white p-4 rounded-lg shadow-md">
+    <h3 class="text-lg font-semibold">Approved Applications</h3>
+    <p class="text-2xl">{{ approved_applications }}</p>
+  </div>
+  <div class="bg-white p-4 rounded-lg shadow-md">
+    <h3 class="text-lg font-semibold">Total Payments</h3>
+    <p class="text-2xl">KES {{ total_payments|floatformat:2 }}</p>
+  </div>
+  <div class="bg-white p-4 rounded-lg shadow-md">
+    <h3 class="text-lg font-semibold">Qualified Students</h3>
+    <p class="text-2xl">{{ qualified_students }}</p>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,145 @@
+{% extends 'base.html' %}
+{% load widget_tweaks %}
+
+{% block content %}
+<style>
+  .receipt-hero {
+    background: linear-gradient(135deg, #78350f 0%, #d97706 100%);
+    border-radius: 16px; padding: 2rem 2.5rem;
+    color: white; margin-bottom: 2rem;
+  }
+  .receipt-hero h2 { font-size: 1.8rem; font-weight: 800; margin: 0 0 0.3rem; }
+  .receipt-hero p  { opacity: 0.85; margin: 0; }
+
+  .info-box {
+    display: flex; align-items: flex-start; gap: 1rem;
+    background: #fffbeb; border: 1.5px solid #fde68a;
+    border-radius: 12px; padding: 1rem 1.25rem; margin-bottom: 1.75rem;
+  }
+  .info-box .icon { font-size: 1.8rem; }
+  .info-box p { margin: 0; font-size: 0.875rem; color: #92400e; }
+  .info-box strong { display: block; margin-bottom: 0.25rem; color: #78350f; }
+
+  .form-card {
+    background: #fff; border-radius: 14px;
+    border: 1.5px solid #e5e7eb; padding: 2rem;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.05); max-width: 600px;
+  }
+  .form-card h3 { font-size: 1rem; font-weight: 700; color: #374151;
+    border-bottom: 1.5px solid #f3f4f6; padding-bottom: 0.75rem; margin: 0 0 1.25rem; }
+  .form-group { margin-bottom: 1.25rem; }
+  .form-group label { display: block; font-size: 0.875rem; font-weight: 600; color: #374151; margin-bottom: 0.4rem; }
+  .form-group input[type="text"],
+  .form-group input[type="number"],
+  .form-group input[type="file"] {
+    width: 100%; border: 1.5px solid #d1d5db; border-radius: 8px;
+    padding: 0.6rem 0.85rem; font-size: 0.9rem; color: #1f2937;
+    transition: border-color 0.2s; box-sizing: border-box;
+  }
+  .form-group input:focus { border-color: #d97706; outline: none; }
+  .form-group .helptext { font-size: 0.78rem; color: #9ca3af; margin-top: 0.3rem; }
+  .errorlist { color: #dc2626; font-size: 0.82rem; margin: 0.3rem 0 0; padding-left: 1rem; }
+
+  /* Drop zone styling */
+  .drop-zone {
+    border: 2px dashed #d97706; border-radius: 12px;
+    padding: 2.5rem; text-align: center; background: #fffbeb;
+    cursor: pointer; transition: background 0.2s;
+  }
+  .drop-zone:hover { background: #fef3c7; }
+  .drop-zone p { color: #92400e; margin: 0.5rem 0 0; font-size: 0.875rem; }
+  .drop-zone input[type="file"] { display: none; }
+  .drop-zone-label { cursor: pointer; }
+
+  .upload-btn {
+    background: #d97706; color: #fff; border: none;
+    padding: 0.8rem 2rem; border-radius: 10px;
+    font-size: 1rem; font-weight: 700; cursor: pointer;
+    transition: background 0.15s, transform 0.15s; margin-top: 1rem;
+  }
+  .upload-btn:hover { background: #b45309; transform: translateY(-2px); }
+
+  .disbursed-info {
+    background: #f5f3ff; border: 1.5px solid #ddd6fe;
+    border-radius: 10px; padding: 0.85rem 1rem; margin-bottom: 1.5rem;
+    font-size: 0.875rem; color: #5b21b6;
+  }
+</style>
+
+<div class="receipt-hero">
+  <h2>🧾 Upload Bank Receipt</h2>
+  <p>Submit your bank deposit slip after depositing your cheque</p>
+</div>
+
+<div class="info-box">
+  <div class="icon">ℹ️</div>
+  <p>
+    <strong>What is this for?</strong>
+    After the bursary committee issues you a cheque, you must deposit it at your bank.
+    The bank will give you a <strong>deposit slip / receipt</strong> confirming the deposit —
+    upload that document here so it can be recorded in the system.
+  </p>
+</div>
+
+{% if disbursed_app %}
+  <div class="disbursed-info">
+    💰 <strong>Disbursed Application:</strong> Ref #{{ disbursed_app.pk }} — {{ disbursed_app.submitted_at|date:"d M Y" }}
+  </div>
+{% endif %}
+
+<div class="form-card">
+  <h3>📎 Receipt Details</h3>
+  <form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+
+    {% for message in messages %}
+      <div style="background:#fee2e2;border-radius:8px;padding:0.75rem 1rem;margin-bottom:1rem;color:#991b1b;font-size:0.875rem;">
+        {{ message }}
+      </div>
+    {% endfor %}
+
+    <div class="form-group">
+      <label for="{{ form.amount.id_for_label }}">{{ form.amount.label }}</label>
+      {{ form.amount }}
+      {% if form.amount.errors %}<ul class="errorlist">{% for e in form.amount.errors %}<li>{{ e }}</li>{% endfor %}</ul>{% endif %}
+    </div>
+
+    <div class="form-group">
+      <label for="{{ form.bank_name.id_for_label }}">{{ form.bank_name.label }}</label>
+      {{ form.bank_name }}
+      {% if form.bank_name.errors %}<ul class="errorlist">{% for e in form.bank_name.errors %}<li>{{ e }}</li>{% endfor %}</ul>{% endif %}
+    </div>
+
+    <div class="form-group">
+      <label>{{ form.receipt.label }}</label>
+      <label class="drop-zone" id="drop-label">
+        {{ form.receipt }}
+        <span style="font-size:2rem;">📄</span>
+        <p id="file-name-display">Click to browse or drag & drop your bank receipt here</p>
+        <p style="color:#b45309; font-size:0.78rem;">Accepted: PDF, JPG, PNG</p>
+      </label>
+      {% if form.receipt.errors %}<ul class="errorlist">{% for e in form.receipt.errors %}<li>{{ e }}</li>{% endfor %}</ul>{% endif %}
+    </div>
+
+    <button type="submit" class="upload-btn">⬆ Upload Receipt</button>
+  </form>
+</div>
+
+<div style="margin-top:1.5rem;">
+  <a href="{% url 'home' %}" style="color:#6b7280; font-size:0.9rem; text-decoration:none;">← Back to Dashboard</a>
+</div>
+
+<script>
+  // Show selected filename in drop zone
+  const fileInput = document.querySelector('input[type="file"]');
+  const display = document.getElementById('file-name-display');
+  if (fileInput) {
+    fileInput.addEventListener('change', function() {
+      if (this.files.length > 0) {
+        display.textContent = '✅ Selected: ' + this.files[0].name;
+        display.style.color = '#065f46';
+      }
+    });
+  }
+</script>
+{% endblock %}

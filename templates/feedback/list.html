@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h2 class="text-2xl font-bold mb-4">Feedback List</h2>
+{% for feedback in feedbacks %}
+<div class="bg-white p-4 rounded-lg shadow-md mb-4">
+    <p><strong>Student:</strong> {{ feedback.student.username }}</p>
+    <p><strong>Status:</strong> {{ feedback.qualification_status }}</p>
+    <p><strong>Comments:</strong> {{ feedback.comments }}</p>
+    <p><strong>Reviewed by:</strong> {{ feedback.reviewed_by.username if feedback.reviewed_by else 'N/A' }}</p>
+    {% if user.is_admin %}
+        <a href="{% url 'feedback:provide' feedback.student.id %}" class="bg-blue-600 text-white px-4 py-2 rounded">Edit Feedback</a>
+    {% endif %}
+</div>
+{% empty %}
+<p>No feedback found.</p>
+{% endfor %}
+{% endblock %}

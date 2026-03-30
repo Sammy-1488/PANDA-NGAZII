@@ -1,0 +1,252 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<style>
+  .status-hero {
+    background: linear-gradient(135deg, #4c1d95 0%, #7c3aed 100%);
+    border-radius: 16px; padding: 2rem 2.5rem;
+    color: white; margin-bottom: 2rem;
+  }
+  .status-hero h2 { font-size: 1.8rem; font-weight: 800; margin: 0 0 0.3rem; }
+  .status-hero p  { opacity: 0.85; margin: 0; }
+
+  .app-card {
+    background: #fff; border-radius: 14px;
+    border: 1.5px solid #e5e7eb;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+    margin-bottom: 2rem; overflow: hidden;
+  }
+  .app-card-header {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 1rem 1.5rem;
+    border-bottom: 1.5px solid #f3f4f6;
+    background: #f9fafb;
+  }
+  .app-card-header .date { font-size: 0.82rem; color: #6b7280; }
+  .app-card-body { padding: 1.5rem; }
+
+  /* Status Badge */
+  .status-badge {
+    display: inline-flex; align-items: center; gap: 0.35rem;
+    font-size: 0.82rem; font-weight: 700;
+    padding: 0.3rem 0.85rem; border-radius: 999px;
+  }
+  .badge-pending   { background:#fef3c7; color:#92400e; }
+  .badge-qualified { background:#d1fae5; color:#065f46; }
+  .badge-approved  { background:#dbeafe; color:#1d4ed8; }
+  .badge-disbursed { background:#ede9fe; color:#5b21b6; }
+  .badge-rejected  { background:#fee2e2; color:#991b1b; }
+
+  /* Progress Stepper */
+  .stepper {
+    display: flex; align-items: center;
+    margin: 1.5rem 0 1.25rem; position: relative;
+  }
+  .step {
+    display: flex; flex-direction: column; align-items: center;
+    flex: 1; position: relative; z-index: 1;
+  }
+  .step-circle {
+    width: 36px; height: 36px; border-radius: 50%;
+    border: 2.5px solid #d1d5db;
+    background: #fff; font-size: 0.85rem; font-weight: 700;
+    display: flex; align-items: center; justify-content: center;
+    color: #9ca3af; transition: all 0.3s;
+  }
+  .step-label {
+    font-size: 0.7rem; font-weight: 600; margin-top: 0.4rem;
+    color: #9ca3af; text-align: center; white-space: nowrap;
+  }
+  .step.done .step-circle  { background: #7c3aed; border-color: #7c3aed; color: #fff; }
+  .step.done .step-label   { color: #7c3aed; }
+  .step.current .step-circle {
+    background: #fff; border-color: #7c3aed; color: #7c3aed;
+    box-shadow: 0 0 0 4px rgba(124,58,237,0.15);
+  }
+  .step.current .step-label { color: #7c3aed; font-weight: 700; }
+
+  .stepper-line {
+    position: absolute; top: 18px; left: 10%; right: 10%;
+    height: 2px; background: #e5e7eb; z-index: 0;
+  }
+  .stepper-line-fill {
+    height: 100%; background: #7c3aed; transition: width 0.4s;
+  }
+
+  .rejected-banner {
+    display: flex; align-items: center; gap: 0.75rem;
+    background: #fef2f2; border: 1.5px solid #fecaca;
+    border-radius: 10px; padding: 1rem 1.25rem; margin: 1rem 0;
+  }
+  .rejected-banner p { margin: 0; font-size: 0.875rem; color: #991b1b; }
+
+  .details-grid {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;
+    font-size: 0.875rem;
+  }
+  @media (max-width: 600px) { .details-grid { grid-template-columns: 1fr; } }
+  .detail-box { background: #f9fafb; border-radius: 8px; padding: 0.85rem 1rem; }
+  .detail-box strong { display: block; color: #374151; font-weight: 700; margin-bottom: 0.25rem; }
+  .detail-box span { color: #6b7280; }
+
+  .docs-row {
+    display: flex; flex-wrap: wrap; gap: 0.75rem;
+    margin-top: 1rem;
+  }
+  .doc-link {
+    display: inline-flex; align-items: center; gap: 0.35rem;
+    font-size: 0.82rem; font-weight: 600;
+    padding: 0.4rem 0.85rem; border-radius: 8px;
+    text-decoration: none; background: #ede9fe; color: #5b21b6;
+    transition: background 0.15s;
+  }
+  .doc-link:hover { background: #ddd6fe; text-decoration: none; }
+
+  .receipt-cta {
+    display: flex; align-items: center; gap: 1rem;
+    background: #fffbeb; border: 1.5px solid #fde68a;
+    border-radius: 12px; padding: 1rem 1.25rem; margin-top: 1rem;
+  }
+  .receipt-cta p { margin: 0; font-size: 0.875rem; color: #92400e; }
+  .receipt-btn {
+    display: inline-flex; align-items: center; gap: 0.35rem;
+    background: #d97706; color: #fff;
+    padding: 0.5rem 1rem; border-radius: 8px;
+    font-weight: 700; font-size: 0.875rem;
+    text-decoration: none; white-space: nowrap;
+  }
+  .receipt-btn:hover { background: #b45309; color:#fff; text-decoration:none; }
+
+  .empty-state {
+    text-align: center; padding: 3rem; color: #6b7280;
+  }
+  .empty-state h3 { font-size: 1.1rem; font-weight: 700; margin-bottom: 0.5rem; }
+
+  /* Admin view */
+  .admin-badge {
+    display: inline-block; font-size: 0.7rem; font-weight: 700;
+    background: #f3f4f6; color: #374151;
+    padding: 0.15rem 0.5rem; border-radius: 4px; margin-left: 0.5rem;
+  }
+</style>
+
+<div class="status-hero">
+  <h2>📊 Application Status</h2>
+  <p>
+    {% if user.is_student %}Track your application progress{% else %}All student applications{% endif %}
+  </p>
+</div>
+
+{% if enriched_applications %}
+
+  {% for item in enriched_applications %}
+  {% with app=item.app %}
+  <div class="app-card">
+    <div class="app-card-header">
+      <div>
+        <strong>
+          {% if not user.is_student %}{{ app.student.username }} <span class="admin-badge">student</span>{% else %}My Application{% endif %}
+        </strong>
+        <span class="admin-badge">Ref #{{ app.pk }}</span>
+      </div>
+      <div style="display:flex; align-items:center; gap:0.75rem;">
+        <span class="date">Submitted: {{ app.submitted_at|date:"d M Y, H:i" }}</span>
+        <span class="status-badge badge-{{ app.status }}">
+          {% if app.status == 'pending' %}⏳
+          {% elif app.status == 'qualified' %}✅
+          {% elif app.status == 'approved' %}🎉
+          {% elif app.status == 'disbursed' %}💰
+          {% elif app.status == 'rejected' %}❌
+          {% endif %}
+          {{ app.get_status_display }}
+        </span>
+      </div>
+    </div>
+
+    <div class="app-card-body">
+
+      {% if not item.is_rejected %}
+        <!-- Progress Stepper -->
+        <div class="stepper">
+          <div class="stepper-line">
+            <div class="stepper-line-fill" style="width:{% if item.step_index == 0 %}0%{% elif item.step_index == 1 %}33%{% elif item.step_index == 2 %}66%{% elif item.step_index >= 3 %}100%{% else %}0%{% endif %};"></div>
+          </div>
+          {% for step_name in status_steps %}
+          <div class="step {% if forloop.counter0 < item.step_index %}done{% elif forloop.counter0 == item.step_index %}current{% endif %}">
+            <div class="step-circle">
+              {% if forloop.counter0 < item.step_index %}✓{% else %}{{ forloop.counter }}{% endif %}
+            </div>
+            <span class="step-label">{{ step_name|capfirst }}</span>
+          </div>
+          {% endfor %}
+        </div>
+      {% else %}
+        <div class="rejected-banner">
+          <span style="font-size:1.5rem;">❌</span>
+          <p><strong>Application Not Successful.</strong> Unfortunately your application was not approved at this time. You may contact the bursary office for further guidance.</p>
+        </div>
+      {% endif %}
+
+      <!-- Details Grid -->
+      <div class="details-grid">
+        <div class="detail-box">
+          <strong>Vulnerability Details</strong>
+          <span>{{ app.vulnerability_details|truncatechars:200 }}</span>
+        </div>
+        <div class="detail-box">
+          <strong>Family Background</strong>
+          <span>{{ app.family_background|truncatechars:200 }}</span>
+        </div>
+      </div>
+
+      <!-- Documents -->
+      <div class="docs-row">
+        {% if app.filled_form %}
+          <a href="{{ app.filled_form.url }}" class="doc-link" target="_blank">📄 Filled Application Form</a>
+        {% endif %}
+        {% if app.supporting_documents %}
+          <a href="{{ app.supporting_documents.url }}" class="doc-link" target="_blank">📎 Supporting Documents</a>
+        {% endif %}
+      </div>
+
+      <!-- Receipt Upload Prompt (only when disbursed and student) -->
+      {% if item.is_disbursed and user.is_student %}
+        {% with has_receipt=app.receipts.exists %}
+        <div class="receipt-cta">
+          <span style="font-size:1.5rem;">🧾</span>
+          <p>
+            {% if has_receipt %}
+              <strong>Receipt uploaded! ✅</strong> Thank you for uploading your bank deposit slip.
+            {% else %}
+              <strong>Funds have been disbursed!</strong> Please take your cheque to the bank, then upload the deposit slip / receipt here.
+            {% endif %}
+          </p>
+          {% if not has_receipt %}
+            <a href="{% url 'payments:upload' %}" class="receipt-btn">⬆ Upload Receipt</a>
+          {% else %}
+            <a href="{% url 'payments:history' %}" class="receipt-btn" style="background:#16a34a;">View Receipt</a>
+          {% endif %}
+        </div>
+        {% endwith %}
+      {% endif %}
+
+    </div>
+  </div>
+  {% endwith %}
+  {% endfor %}
+
+{% else %}
+  <div class="empty-state">
+    <p style="font-size:2.5rem; margin-bottom:0.5rem;">📭</p>
+    <h3>No Applications Found</h3>
+    <p>{% if user.is_student %}You haven't submitted an application yet.{% else %}No applications in the system yet.{% endif %}</p>
+    {% if user.is_student %}
+      <a href="{% url 'applications:submit' %}" style="display:inline-block;margin-top:1rem;background:#16a34a;color:#fff;padding:0.65rem 1.5rem;border-radius:10px;font-weight:700;text-decoration:none;">Submit Application</a>
+    {% endif %}
+  </div>
+{% endif %}
+
+<div style="margin-top:1rem;">
+  <a href="{% url 'home' %}" style="color:#6b7280; font-size:0.9rem; text-decoration:none;">← Back to Dashboard</a>
+</div>
+{% endblock %}

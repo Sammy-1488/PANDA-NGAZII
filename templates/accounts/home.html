@@ -1,0 +1,232 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<style>
+  :root {
+    --primary: #1e40af;
+    --primary-light: #3b82f6;
+    --success: #16a34a;
+    --warning: #d97706;
+    --danger: #dc2626;
+    --purple: #7c3aed;
+    --muted: #6b7280;
+  }
+
+  .portal-hero {
+    background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 50%, #2563eb 100%);
+    border-radius: 16px;
+    padding: 2rem 2.5rem;
+    color: white;
+    margin-bottom: 2rem;
+    position: relative;
+    overflow: hidden;
+  }
+  .portal-hero::before {
+    content: '';
+    position: absolute;
+    top: -40px; right: -40px;
+    width: 200px; height: 200px;
+    background: rgba(255,255,255,0.06);
+    border-radius: 50%;
+  }
+  .portal-hero::after {
+    content: '';
+    position: absolute;
+    bottom: -60px; left: 20%;
+    width: 280px; height: 280px;
+    background: rgba(255,255,255,0.04);
+    border-radius: 50%;
+  }
+  .portal-hero h2 { font-size: 1.8rem; font-weight: 700; margin: 0 0 0.4rem; }
+  .portal-hero p { opacity: 0.85; margin: 0; font-size: 1rem; }
+
+  .modules-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+  }
+
+  .module-card {
+    background: #fff;
+    border-radius: 14px;
+    border: 1.5px solid #e5e7eb;
+    padding: 1.75rem 1.5rem;
+    transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s;
+    text-decoration: none;
+    color: inherit;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    overflow: hidden;
+  }
+  .module-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 30px rgba(0,0,0,0.1);
+    border-color: var(--primary-light);
+    text-decoration: none;
+  }
+  .module-card .card-icon {
+    font-size: 2.2rem;
+    margin-bottom: 1rem;
+    display: inline-block;
+  }
+  .module-card h3 {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #111827;
+    margin: 0 0 0.5rem;
+  }
+  .module-card p {
+    font-size: 0.875rem;
+    color: var(--muted);
+    margin: 0 0 1.25rem;
+    flex: 1;
+  }
+  .card-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-size: 0.875rem;
+    font-weight: 600;
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    transition: opacity 0.15s;
+    text-decoration: none;
+  }
+  .card-btn:hover { opacity: 0.85; text-decoration: none; }
+  .btn-blue  { background: #1e40af; color: #fff; }
+  .btn-green { background: #16a34a; color: #fff; }
+  .btn-yellow{ background: #d97706; color: #fff; }
+  .btn-purple{ background: #7c3aed; color: #fff; }
+
+  .accent-bar {
+    position: absolute;
+    top: 0; left: 0;
+    width: 4px; height: 100%;
+    border-radius: 14px 0 0 14px;
+  }
+
+  .status-badge {
+    display: inline-block;
+    font-size: 0.75rem;
+    font-weight: 600;
+    padding: 0.2rem 0.65rem;
+    border-radius: 999px;
+    margin-left: 0.5rem;
+    vertical-align: middle;
+  }
+  .badge-pending  { background:#fef3c7; color:#92400e; }
+  .badge-qualified{ background:#d1fae5; color:#065f46; }
+  .badge-approved { background:#dbeafe; color:#1d4ed8; }
+  .badge-disbursed{ background:#ede9fe; color:#5b21b6; }
+  .badge-rejected { background:#fee2e2; color:#991b1b; }
+
+  .admin-section {
+    background: #f8fafc;
+    border: 1.5px solid #e5e7eb;
+    border-radius: 14px;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+  }
+  .admin-section h3 { font-size: 1rem; font-weight: 700; color: #374151; margin: 0 0 1rem; }
+  .admin-links { display: flex; flex-wrap: wrap; gap: 0.75rem; }
+  .admin-link {
+    display: inline-flex; align-items: center; gap: 0.4rem;
+    background: #374151; color: #fff;
+    font-size: 0.875rem; font-weight: 600;
+    padding: 0.5rem 1rem; border-radius: 8px;
+    text-decoration: none; transition: background 0.15s;
+  }
+  .admin-link:hover { background: #111827; text-decoration: none; color: #fff; }
+</style>
+
+<div class="portal-hero">
+  <h2>👋 Welcome, {{ user.username }}</h2>
+  <p>
+    {% if user.is_student %}
+      Panda Ngazi Bursary &amp; Scholarship Management Portal
+    {% else %}
+      Admin Dashboard — Panda Ngazi
+    {% endif %}
+  </p>
+</div>
+
+{% if user.is_student %}
+  {% with latest_app=user.application_set.first %}
+  <div class="modules-grid">
+
+    <!-- Module 1: Download Application Form -->
+    <div class="module-card">
+      <div class="accent-bar" style="background:#1e40af;"></div>
+      <span class="card-icon">📄</span>
+      <h3>Application Form</h3>
+      <p>Download the official blank application form, fill it in, and upload it back through the Submit Application module.</p>
+      <a href="{% url 'applications:download_form' %}" class="card-btn btn-blue">⬇ Download Form</a>
+    </div>
+
+    <!-- Module 2: Submit / Upload Filled Application -->
+    <div class="module-card">
+      <div class="accent-bar" style="background:#16a34a;"></div>
+      <span class="card-icon">📝</span>
+      <h3>Submit Application</h3>
+      <p>Upload your completed application form along with supporting documents (school letter, ID, etc.).</p>
+      <a href="{% url 'applications:submit' %}" class="card-btn btn-green">
+        {% if latest_app %}📤 Update Application{% else %}📤 Submit Application{% endif %}
+      </a>
+    </div>
+
+    <!-- Module 3: Application Status -->
+    <div class="module-card">
+      <div class="accent-bar" style="background:#7c3aed;"></div>
+      <span class="card-icon">📊</span>
+      <h3>Application Status
+        {% if latest_app %}
+          <span class="status-badge badge-{{ latest_app.status }}">{{ latest_app.get_status_display }}</span>
+        {% endif %}
+      </h3>
+      <p>Track where your application stands — from submission through qualification, approval, and disbursement.</p>
+      <a href="{% url 'applications:status' %}" class="card-btn btn-purple">View Status</a>
+    </div>
+
+    <!-- Module 4: Upload Bank Receipt -->
+    <div class="module-card">
+      <div class="accent-bar" style="background:#d97706;"></div>
+      <span class="card-icon">🧾</span>
+      <h3>Upload Bank Receipt</h3>
+      <p>After receiving your cheque and depositing it at the bank, upload the bank deposit slip / receipt here.</p>
+      {% if latest_app and latest_app.status == 'disbursed' %}
+        <a href="{% url 'payments:upload' %}" class="card-btn btn-yellow">⬆ Upload Receipt</a>
+      {% else %}
+        <span style="font-size:0.82rem;color:var(--muted);">
+          ⏳ Available once funds are disbursed.
+        </span>
+      {% endif %}
+    </div>
+
+  </div>
+  {% endwith %}
+
+  <!-- Payment History link -->
+  <div style="margin-top:0.5rem;">
+    <a href="{% url 'payments:history' %}" style="color:var(--primary); font-size:0.9rem; font-weight:600; text-decoration:none;">
+      📋 View Payment/Receipt History →
+    </a>
+  </div>
+
+{% elif user.is_admin %}
+
+  <div class="admin-section">
+    <h3>⚙️ Admin Actions</h3>
+    <div class="admin-links">
+      <a href="{% url 'applications:status' %}" class="admin-link">📋 Manage Applications</a>
+      <a href="{% url 'payments:history' %}" class="admin-link">💳 Manage Payments</a>
+      <a href="{% url 'reports:dashboard' %}" class="admin-link">📈 View Reports</a>
+      <a href="{% url 'feedback:list' %}" class="admin-link">💬 Manage Feedback</a>
+      <a href="/admin/" class="admin-link">🛠 Django Admin</a>
+    </div>
+  </div>
+
+{% endif %}
+{% endblock %}

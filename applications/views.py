@@ -9,8 +9,6 @@ from .models import Application, ApplicationFormTemplate
 def download_application_form(request):
     """Serve the latest active application form template for download."""
     template = ApplicationFormTemplate.objects.filter(is_active=True).first()
-    if not template:
-        raise Http404("No application form is currently available. Please contact admin.")
     return render(request, 'applications/download_form.html', {'form_template': template})
 
 

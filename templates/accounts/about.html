@@ -1,0 +1,123 @@
+{% extends 'base.html' %}
+{% block title %}About the Portal{% endblock %}
+
+{% block content %}
+<div class="page-wrapper" style="max-width:960px;">
+
+  <!-- Hero -->
+  <div class="page-hero hero-navy">
+    <div class="page-hero-content">
+      <h1>About the TUK Bursary Portal</h1>
+      <p>Helping Technical University of Kenya students access financial aid for their education.</p>
+    </div>
+  </div>
+
+  <!-- What is it? -->
+  <div class="card" style="margin-bottom:var(--spacing-6);">
+    <div class="card-body">
+      <h2 style="font-size:var(--font-size-xl); margin-bottom:var(--spacing-3);">What is the TUK Bursary Portal?</h2>
+      <p style="color:var(--gray-600); line-height:1.8;">
+        The TUK Bursary & Scholarship Portal is the official digital platform for managing financial aid applications
+        at Technical University of Kenya. It enables eligible students from financially vulnerable backgrounds to
+        apply for bursaries and scholarships, track their applications, and confirm receipt of disbursed funds —
+        all through a single, secure online system.
+      </p>
+    </div>
+  </div>
+
+  <!-- Who can apply? -->
+  <div class="card" style="margin-bottom:var(--spacing-6);">
+    <div class="card-body">
+      <h2 style="font-size:var(--font-size-xl); margin-bottom:var(--spacing-4);">Who Can Apply?</h2>
+      <div class="detail-grid">
+        <div class="detail-item">
+          <div class="detail-item-label">Eligibility</div>
+          <div class="detail-item-value">Currently enrolled TUK students who are experiencing financial hardship and are unable to meet their fee obligations.</div>
+        </div>
+        <div class="detail-item">
+          <div class="detail-item-label">Email Requirement</div>
+          <div class="detail-item-value">You must have an active TUK institutional email address ending in <strong>@students.tuk.ac.ke</strong> to register.</div>
+        </div>
+        <div class="detail-item">
+          <div class="detail-item-label">Documents Needed</div>
+          <div class="detail-item-value">National ID or Birth Certificate, fee statement, letter from school, and a filled application form.</div>
+        </div>
+        <div class="detail-item">
+          <div class="detail-item-label">Frequency</div>
+          <div class="detail-item-value">Applications are reviewed each semester. You may apply once per semester.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- How it works -->
+  <div class="card" style="margin-bottom:var(--spacing-6);">
+    <div class="card-body">
+      <h2 style="font-size:var(--font-size-xl); margin-bottom:var(--spacing-6);">How It Works</h2>
+      <div style="display:flex; flex-direction:column; gap:var(--spacing-5);">
+
+        <div style="display:flex; gap:var(--spacing-4); align-items:flex-start;">
+          <div style="width:48px;height:48px;border-radius:50%;background:var(--tuk-navy);color:#fff;display:flex;align-items:center;justify-content:center;font-size:1.1rem;font-weight:800;flex-shrink:0;">1</div>
+          <div>
+            <h3 style="font-size:var(--font-size-base); margin-bottom:0.3rem;">Register Your Account</h3>
+            <p style="color:var(--gray-600); font-size:var(--font-size-sm);">Sign up with your official TUK student email. Your registration is verified against your student number.</p>
+          </div>
+        </div>
+
+        <div style="display:flex; gap:var(--spacing-4); align-items:flex-start;">
+          <div style="width:48px;height:48px;border-radius:50%;background:var(--tuk-maroon);color:#fff;display:flex;align-items:center;justify-content:center;font-size:1.1rem;font-weight:800;flex-shrink:0;">2</div>
+          <div>
+            <h3 style="font-size:var(--font-size-base); margin-bottom:0.3rem;">Download the Application Form</h3>
+            <p style="color:var(--gray-600); font-size:var(--font-size-sm);">Download the official blank application form from the portal, print and fill it, then scan or photograph it.</p>
+          </div>
+        </div>
+
+        <div style="display:flex; gap:var(--spacing-4); align-items:flex-start;">
+          <div style="width:48px;height:48px;border-radius:50%;background:var(--tuk-gold);color:var(--tuk-navy);display:flex;align-items:center;justify-content:center;font-size:1.1rem;font-weight:800;flex-shrink:0;">3</div>
+          <div>
+            <h3 style="font-size:var(--font-size-base); margin-bottom:0.3rem;">Submit Your Application</h3>
+            <p style="color:var(--gray-600); font-size:var(--font-size-sm);">Upload the filled form, supporting documents, and fill in your personal statement about your financial situation.</p>
+          </div>
+        </div>
+
+        <div style="display:flex; gap:var(--spacing-4); align-items:flex-start;">
+          <div style="width:48px;height:48px;border-radius:50%;background:#7c3aed;color:#fff;display:flex;align-items:center;justify-content:center;font-size:1.1rem;font-weight:800;flex-shrink:0;">4</div>
+          <div>
+            <h3 style="font-size:var(--font-size-base); margin-bottom:0.3rem;">Track Your Application</h3>
+            <p style="color:var(--gray-600); font-size:var(--font-size-sm);">The Bursary Committee reviews applications and updates statuses: Pending → Qualified → Approved → Disbursed.</p>
+          </div>
+        </div>
+
+        <div style="display:flex; gap:var(--spacing-4); align-items:flex-start;">
+          <div style="width:48px;height:48px;border-radius:50%;background:var(--success);color:#fff;display:flex;align-items:center;justify-content:center;font-size:1.1rem;font-weight:800;flex-shrink:0;">5</div>
+          <div>
+            <h3 style="font-size:var(--font-size-base); margin-bottom:0.3rem;">Receive & Confirm Funds</h3>
+            <p style="color:var(--gray-600); font-size:var(--font-size-sm);">Once disbursed, collect your cheque from the Bursary Office, deposit it at the bank, and upload your bank deposit slip to the portal.</p>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- Contact -->
+  <div class="notice-box notice-gold">
+    <span class="notice-icon">📞</span>
+    <div class="notice-body">
+      <h4>Contact the Bursary Office</h4>
+      <p>For assistance, visit the Student Affairs Division at the TUK Main Campus or email <strong>bursary@tuk.ac.ke</strong>.</p>
+    </div>
+  </div>
+
+  <!-- CTA -->
+  <div style="text-align:center; margin-top:var(--spacing-8);">
+    {% if not user.is_authenticated %}
+    <a href="{% url 'register_student' %}" class="btn btn-maroon btn-lg" id="about-cta-register">🎓 Register as a Student →</a>
+    <a href="{% url 'login' %}" class="btn btn-outline btn-lg" style="margin-left:var(--spacing-3);" id="about-cta-login">Sign In</a>
+    {% else %}
+    <a href="{% url 'home' %}" class="btn btn-primary btn-lg" id="about-cta-home">← Back to Dashboard</a>
+    {% endif %}
+  </div>
+
+</div>
+{% endblock %}

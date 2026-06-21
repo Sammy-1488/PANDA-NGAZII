@@ -1,18 +1,84 @@
 {% extends 'base.html' %}
+{% block title %}Feedback List{% endblock %}
 
 {% block content %}
-<h2 class="text-2xl font-bold mb-4">Feedback List</h2>
-{% for feedback in feedbacks %}
-<div class="bg-white p-4 rounded-lg shadow-md mb-4">
-    <p><strong>Student:</strong> {{ feedback.student.username }}</p>
-    <p><strong>Status:</strong> {{ feedback.qualification_status }}</p>
-    <p><strong>Comments:</strong> {{ feedback.comments }}</p>
-    <p><strong>Reviewed by:</strong> {{ feedback.reviewed_by.username if feedback.reviewed_by else 'N/A' }}</p>
+<div class="page-wrapper">
+
+  <div class="page-hero hero-purple" style="margin-bottom:var(--spacing-6);">
+    <div class="page-hero-content">
+      <h1>💬 {% if user.is_admin %}All Feedback Messages{% else %}My Messages{% endif %}</h1>
+      <p>{% if user.is_admin %}All messages sent to students by the Bursary Committee{% else %}Messages from the Bursary Office{% endif %}</p>
+    </div>
+  </div>
+
+  {% if feedbacks %}
+  <div class="table-wrapper">
+    <table class="data-table" id="feedback-table">
+      <thead>
+        <tr>
+          <th>#</th>
+          {% if user.is_admin %}<th>Student</th>{% endif %}
+          <th>Application</th>
+          <th>Type</th>
+          <th>Message Preview</th>
+          <th>Sent By</th>
+          <th>Date</th>
+          {% if user.is_admin %}<th>Action</th>{% endif %}
+        </tr>
+      </thead>
+      <tbody>
+        {% for fb in feedbacks %}
+        <tr id="feedback-row-{{ fb.pk }}">
+          <td style="color:var(--gray-400); font-size:var(--font-size-xs);">#{{ fb.pk }}</td>
+          {% if user.is_admin %}
+          <td>
+            <div style="font-weight:600; font-size:var(--font-size-sm);">{{ fb.student.full_name }}</div>
+            <div style="font-size:var(--font-size-xs); color:var(--gray-400);">{{ fb.student.email }}</div>
+          </td>
+          {% endif %}
+          <td>
+            {% if fb.application %}
+              <a href="{% url 'applications:detail' pk=fb.application.pk %}" class="btn btn-ghost btn-sm">Ref #{{ fb.application.pk }}</a>
+            {% else %}<span style="color:var(--gray-400);">—</span>{% endif %}
+          </td>
+          <td>
+            <span class="badge
+              {% if fb.feedback_type == 'approval_note' %}badge-verified
+              {% elif fb.feedback_type == 'rejection_reason' %}badge-rejected
+              {% elif fb.feedback_type == 'clarification' %}badge-unverified
+              {% else %}badge-navy
+              {% endif %}">{{ fb.get_feedback_type_display }}</span>
+          </td>
+          <td style="max-width:260px; font-size:var(--font-size-sm); color:var(--gray-600);">
+            {{ fb.comments|truncatechars:80 }}
+          </td>
+          <td style="font-size:var(--font-size-sm);">{{ fb.reviewed_by.full_name|default:"System" }}</td>
+          <td style="font-size:var(--font-size-xs); color:var(--gray-500);">{{ fb.reviewed_at|date:"d M Y" }}</td>
+          {% if user.is_admin %}
+          <td>
+            {% if fb.application %}
+            <a href="{% url 'feedback:provide' application_id=fb.application.pk %}" class="btn btn-outline btn-sm" id="reply-feedback-{{ fb.pk }}">Reply</a>
+            {% endif %}
+          </td>
+          {% endif %}
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <div class="empty-state">
+    <span class="empty-state-icon">💬</span>
+    <h3>No Messages Found</h3>
+    <p>{% if user.is_admin %}No feedback messages have been sent yet. Send feedback from an application's detail page.
+       {% else %}No messages from the Bursary Office yet.{% endif %}</p>
     {% if user.is_admin %}
-        <a href="{% url 'feedback:provide' feedback.student.id %}" class="bg-blue-600 text-white px-4 py-2 rounded">Edit Feedback</a>
+      <a href="{% url 'applications:status' %}" class="btn btn-primary" id="go-to-apps-btn">View Applications →</a>
     {% endif %}
+  </div>
+  {% endif %}
+
+  <a href="{% url 'home' %}" class="back-link">← Back to Dashboard</a>
+
 </div>
-{% empty %}
-<p>No feedback found.</p>
-{% endfor %}
 {% endblock %}

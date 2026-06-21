@@ -1,12 +1,146 @@
 {% extends 'base.html' %}
+{% load static %}
+{% block title %}Student Registration{% endblock %}
 
 {% block content %}
-<div class="max-w-md mx-auto bg-white p-6 rounded-lg shadow-md">
-    <h2 class="text-2xl font-bold mb-4">Student Registration</h2>
-    <form method="post">
-        {% csrf_token %}
-        {{ form.as_p }}
-        <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded">Register</button>
-    </form>
+<div class="page-wrapper" style="max-width:760px;">
+
+  <!-- Hero -->
+  <div class="page-hero hero-navy" style="margin-bottom:var(--spacing-6);">
+    <div class="page-hero-content">
+      <h1>Student Registration</h1>
+      <p>Create your TUK Bursary Portal account using your official TUK student email.</p>
+    </div>
+  </div>
+
+  <!-- TUK Email Notice -->
+  <div class="notice-box notice-gold" style="margin-bottom:var(--spacing-6);">
+    <span class="notice-icon">🏫</span>
+    <div class="notice-body">
+      <h4>TUK Email Required</h4>
+      <p>
+        You must register using your official TUK student email address ending in
+        <strong>@students.tuk.ac.ke</strong>.
+        Contact the Student Affairs office if you do not have your institutional email.
+      </p>
+    </div>
+  </div>
+
+  {% if messages %}
+    {% for message in messages %}
+    <div class="alert alert-{% if message.tags == 'error' %}danger{% else %}{{ message.tags }}{% endif %}" role="alert">
+      <span class="alert-icon">{% if message.tags == 'error' %}❌{% elif message.tags == 'success' %}✅{% else %}⚠️{% endif %}</span>
+      <span>{{ message }}</span>
+    </div>
+    {% endfor %}
+  {% endif %}
+
+  <form method="post" id="registration-form" novalidate>
+    {% csrf_token %}
+
+    <!-- Section 1: Personal Info -->
+    <div class="form-section">
+      <div class="form-section-title">
+        <div class="section-icon">👤</div>
+        Personal Information
+      </div>
+      <div class="form-grid-2">
+        <div class="form-group">
+          <label class="form-label" for="id_first_name">First Name <span class="required">*</span></label>
+          <input type="text" name="first_name" id="id_first_name" class="form-control"
+            placeholder="e.g. Jane" value="{{ form.first_name.value|default:'' }}" required>
+          {% if form.first_name.errors %}<ul class="errorlist">{% for e in form.first_name.errors %}<li>{{ e }}</li>{% endfor %}</ul>{% endif %}
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="id_last_name">Last Name <span class="required">*</span></label>
+          <input type="text" name="last_name" id="id_last_name" class="form-control"
+            placeholder="e.g. Wanjiku" value="{{ form.last_name.value|default:'' }}" required>
+          {% if form.last_name.errors %}<ul class="errorlist">{% for e in form.last_name.errors %}<li>{{ e }}</li>{% endfor %}</ul>{% endif %}
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="id_email">TUK Student Email <span class="required">*</span></label>
+        <input type="email" name="email" id="id_email" class="form-control"
+          placeholder="s123456@students.tuk.ac.ke" value="{{ form.email.value|default:'' }}"
+          autocomplete="email" required>
+        <p class="form-hint">{{ form.email.help_text }}</p>
+        {% if form.email.errors %}<ul class="errorlist">{% for e in form.email.errors %}<li>{{ e }}</li>{% endfor %}</ul>{% endif %}
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="id_phone">Phone Number</label>
+        <input type="tel" name="phone" id="id_phone" class="form-control"
+          placeholder="e.g. 0712345678" value="{{ form.phone.value|default:'' }}">
+        {% if form.phone.errors %}<ul class="errorlist">{% for e in form.phone.errors %}<li>{{ e }}</li>{% endfor %}</ul>{% endif %}
+      </div>
+    </div>
+
+    <!-- Section 2: Academic Info -->
+    <div class="form-section">
+      <div class="form-section-title">
+        <div class="section-icon">🎓</div>
+        Academic Information
+      </div>
+      <div class="form-grid-2">
+        <div class="form-group">
+          <label class="form-label" for="id_student_number">Admission Number <span class="required">*</span></label>
+          <input type="text" name="student_number" id="id_student_number" class="form-control"
+            placeholder="e.g. TUK/2022/001" value="{{ form.student_number.value|default:'' }}" required>
+          {% if form.student_number.errors %}<ul class="errorlist">{% for e in form.student_number.errors %}<li>{{ e }}</li>{% endfor %}</ul>{% endif %}
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="id_year_of_study">Year of Study <span class="required">*</span></label>
+          <select name="year_of_study" id="id_year_of_study" class="form-control" required>
+            {% for value, label in form.year_of_study.field.choices %}
+            <option value="{{ value }}" {% if form.year_of_study.value == value|stringformat:"s" %}selected{% endif %}>{{ label }}</option>
+            {% endfor %}
+          </select>
+          {% if form.year_of_study.errors %}<ul class="errorlist">{% for e in form.year_of_study.errors %}<li>{{ e }}</li>{% endfor %}</ul>{% endif %}
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="id_course">Course / Programme <span class="required">*</span></label>
+        <input type="text" name="course" id="id_course" class="form-control"
+          placeholder="e.g. Bachelor of Science in Computer Science"
+          value="{{ form.course.value|default:'' }}" required>
+        {% if form.course.errors %}<ul class="errorlist">{% for e in form.course.errors %}<li>{{ e }}</li>{% endfor %}</ul>{% endif %}
+      </div>
+    </div>
+
+    <!-- Section 3: Password -->
+    <div class="form-section">
+      <div class="form-section-title">
+        <div class="section-icon">🔒</div>
+        Set Password
+      </div>
+      <div class="form-grid-2">
+        <div class="form-group">
+          <label class="form-label" for="id_password1">Password <span class="required">*</span></label>
+          <input type="password" name="password1" id="id_password1" class="form-control"
+            placeholder="Choose a strong password" autocomplete="new-password" required>
+          {% if form.password1.errors %}<ul class="errorlist">{% for e in form.password1.errors %}<li>{{ e }}</li>{% endfor %}</ul>{% endif %}
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="id_password2">Confirm Password <span class="required">*</span></label>
+          <input type="password" name="password2" id="id_password2" class="form-control"
+            placeholder="Repeat your password" autocomplete="new-password" required>
+          {% if form.password2.errors %}<ul class="errorlist">{% for e in form.password2.errors %}<li>{{ e }}</li>{% endfor %}</ul>{% endif %}
+        </div>
+      </div>
+      <p class="form-hint">Password must be at least 8 characters and not too common.</p>
+    </div>
+
+    <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:1rem; margin-top:var(--spacing-4);">
+      <button type="submit" class="btn btn-maroon btn-lg" id="register-submit-btn">
+        🎓 Create My Account
+      </button>
+      <p style="font-size:0.875rem; color:var(--gray-500);">
+        Already registered?
+        <a href="{% url 'login' %}" style="color:var(--tuk-navy); font-weight:600;">Sign in →</a>
+      </p>
+    </div>
+  </form>
+
 </div>
 {% endblock %}

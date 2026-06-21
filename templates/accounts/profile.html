@@ -1,0 +1,101 @@
+{% extends 'base.html' %}
+{% block title %}My Profile{% endblock %}
+
+{% block content %}
+<div class="page-wrapper" style="max-width:680px;">
+
+  <div class="page-hero hero-navy" style="margin-bottom:var(--spacing-6);">
+    <div class="page-hero-content">
+      <h1>My Profile</h1>
+      <p>{{ user.email }} &bull; Student #{{ profile.student_number }}</p>
+    </div>
+  </div>
+
+  <!-- Read-only info -->
+  <div class="card" style="margin-bottom:var(--spacing-5);">
+    <div class="card-header">
+      <h3>Account Information</h3>
+      <span class="badge badge-navy">Read-only</span>
+    </div>
+    <div class="card-body">
+      <div class="detail-grid">
+        <div class="detail-item">
+          <div class="detail-item-label">Email Address</div>
+          <div class="detail-item-value">{{ user.email }}</div>
+        </div>
+        <div class="detail-item">
+          <div class="detail-item-label">Admission Number</div>
+          <div class="detail-item-value">{{ profile.student_number }}</div>
+        </div>
+        <div class="detail-item">
+          <div class="detail-item-label">Account Created</div>
+          <div class="detail-item-value">{{ user.date_joined|date:"d M Y" }}</div>
+        </div>
+        <div class="detail-item">
+          <div class="detail-item-label">Account Status</div>
+          <div class="detail-item-value">
+            {% if user.is_active %}<span class="badge badge-verified">✓ Active</span>{% else %}<span class="badge badge-unverified">Inactive</span>{% endif %}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Editable info -->
+  <form method="post" id="profile-update-form">
+    {% csrf_token %}
+    <div class="form-section">
+      <div class="form-section-title">
+        <div class="section-icon">👤</div>
+        Personal Details
+      </div>
+      <div class="form-grid-2">
+        <div class="form-group">
+          <label class="form-label" for="id_first_name">First Name</label>
+          <input type="text" name="first_name" id="id_first_name" class="form-control"
+            value="{{ form.first_name.value|default:user.first_name }}">
+          {% if form.first_name.errors %}<ul class="errorlist">{% for e in form.first_name.errors %}<li>{{ e }}</li>{% endfor %}</ul>{% endif %}
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="id_last_name">Last Name</label>
+          <input type="text" name="last_name" id="id_last_name" class="form-control"
+            value="{{ form.last_name.value|default:user.last_name }}">
+          {% if form.last_name.errors %}<ul class="errorlist">{% for e in form.last_name.errors %}<li>{{ e }}</li>{% endfor %}</ul>{% endif %}
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="id_phone">Phone Number</label>
+        <input type="tel" name="phone" id="id_phone" class="form-control"
+          placeholder="e.g. 0712345678"
+          value="{{ form.phone.value|default:user.phone }}">
+      </div>
+    </div>
+
+    <div class="form-section">
+      <div class="form-section-title">
+        <div class="section-icon">🎓</div>
+        Academic Details
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="id_course">Course / Programme</label>
+        <input type="text" name="course" id="id_course" class="form-control"
+          value="{{ form.course.value|default:profile.course }}">
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="id_year_of_study">Year of Study</label>
+        <select name="year_of_study" id="id_year_of_study" class="form-control">
+          {% for value, label in form.fields.year_of_study.choices %}
+          <option value="{{ value }}" {% if profile.year_of_study == value %}selected{% endif %}>{{ label }}</option>
+          {% endfor %}
+        </select>
+      </div>
+    </div>
+
+    <div style="display:flex; gap:var(--spacing-3);">
+      <button type="submit" class="btn btn-primary" id="profile-save-btn">💾 Save Changes</button>
+      <a href="{% url 'home' %}" class="btn btn-outline">Cancel</a>
+    </div>
+  </form>
+
+</div>
+{% endblock %}

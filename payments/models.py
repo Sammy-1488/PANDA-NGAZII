@@ -20,4 +20,4 @@ class Payment(models.Model):
     verified = models.BooleanField(default=False)
 
     def __str__(self):
-        return f"Receipt by {self.student.username} - KES {self.amount}"
+        return f"Receipt by {self.student.full_name} - KES {self.amount}"

@@ -1,12 +1,73 @@
 {% extends 'base.html' %}
+{% block title %}Send Feedback{% endblock %}
 
 {% block content %}
-<div class="max-w-2xl mx-auto bg-white p-6 rounded-lg shadow-md">
-    <h2 class="text-2xl font-bold mb-4">Provide Feedback for {{ student.username }}</h2>
-    <form method="post">
-        {% csrf_token %}
-        {{ form.as_p }}
-        <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded">Submit Feedback</button>
-    </form>
+<div class="page-wrapper" style="max-width:640px;">
+
+  <div class="page-hero hero-navy" style="margin-bottom:var(--spacing-6);">
+    <div class="page-hero-content">
+      <h1>💬 Send Feedback</h1>
+      <p>Send a message to {{ student.full_name }} regarding Application #{{ application.pk }}</p>
+    </div>
+  </div>
+
+  <!-- Context box -->
+  <div class="card" style="margin-bottom:var(--spacing-5);">
+    <div class="card-header"><h3>Application Details</h3></div>
+    <div class="card-body">
+      <div class="detail-grid">
+        <div class="detail-item">
+          <div class="detail-item-label">Student</div>
+          <div class="detail-item-value">{{ student.full_name }}</div>
+        </div>
+        <div class="detail-item">
+          <div class="detail-item-label">Email</div>
+          <div class="detail-item-value">{{ student.email }}</div>
+        </div>
+        <div class="detail-item">
+          <div class="detail-item-label">Application Ref</div>
+          <div class="detail-item-value">#{{ application.pk }}</div>
+        </div>
+        <div class="detail-item">
+          <div class="detail-item-label">Current Status</div>
+          <div class="detail-item-value"><span class="badge badge-{{ application.status }}">{{ application.get_status_display }}</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <form method="post" id="feedback-form" novalidate>
+    {% csrf_token %}
+    <div class="form-section">
+      <div class="form-section-title">
+        <div class="section-icon">💬</div>
+        Message to Student
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="{{ form.feedback_type.id_for_label }}">Feedback Type <span class="required">*</span></label>
+        <select name="feedback_type" id="{{ form.feedback_type.id_for_label }}" class="form-control" required>
+          {% for val, lbl in form.fields.feedback_type.choices %}
+          <option value="{{ val }}">{{ lbl }}</option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="{{ form.comments.id_for_label }}">Message <span class="required">*</span></label>
+        <textarea name="comments" id="{{ form.comments.id_for_label }}"
+          class="form-control" rows="6"
+          placeholder="Write your message to the student here..."
+          required>{{ form.comments.value|default:'' }}</textarea>
+        {% if form.comments.errors %}<ul class="errorlist">{% for e in form.comments.errors %}<li>{{ e }}</li>{% endfor %}</ul>{% endif %}
+      </div>
+    </div>
+
+    <div style="display:flex; gap:var(--spacing-3); align-items:center; flex-wrap:wrap;">
+      <button type="submit" class="btn btn-primary" id="send-feedback-submit-btn">📤 Send Message</button>
+      <a href="{% url 'applications:detail' pk=application.pk %}" class="btn btn-outline">Cancel</a>
+    </div>
+  </form>
+
 </div>
 {% endblock %}

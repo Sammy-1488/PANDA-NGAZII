@@ -1,93 +1,58 @@
 {% extends 'base.html' %}
+{% block title %}Download Application Form{% endblock %}
 
 {% block content %}
-<style>
-  .dl-hero {
-    background: linear-gradient(135deg, #1e3a8a 0%, #2563eb 100%);
-    border-radius: 16px;
-    padding: 2.5rem;
-    color: white;
-    text-align: center;
-    margin-bottom: 2rem;
-  }
-  .dl-hero h2 { font-size: 1.8rem; font-weight: 800; margin: 0 0 0.5rem; }
-  .dl-hero p  { opacity: 0.85; font-size: 1rem; margin: 0; }
+<div class="page-wrapper" style="max-width:720px;">
 
-  .dl-card {
-    max-width: 540px;
-    margin: 0 auto 2rem;
-    background: #fff;
-    border-radius: 14px;
-    border: 1.5px solid #e5e7eb;
-    padding: 2rem;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.06);
-  }
-  .dl-card h3 { font-size: 1.1rem; font-weight: 700; color: #1f2937; margin: 0 0 0.5rem; }
-  .dl-card .meta { font-size: 0.82rem; color: #6b7280; margin-bottom: 1.5rem; }
-  .dl-btn {
-    display: inline-flex; align-items: center; gap: 0.5rem;
-    background: #1e40af; color: #fff;
-    padding: 0.75rem 1.75rem; border-radius: 10px;
-    font-weight: 700; font-size: 1rem;
-    text-decoration: none; transition: background 0.15s, transform 0.15s;
-  }
-  .dl-btn:hover { background: #1e3a8a; transform: translateY(-2px); color: #fff; text-decoration: none; }
-
-  .steps-box {
-    max-width: 540px;
-    margin: 0 auto;
-    background: #f0f9ff;
-    border: 1.5px solid #bae6fd;
-    border-radius: 12px;
-    padding: 1.5rem;
-  }
-  .steps-box h4 { font-size: 0.95rem; font-weight: 700; color: #0369a1; margin: 0 0 1rem; }
-  .steps-box ol { margin: 0; padding-left: 1.4rem; }
-  .steps-box li { font-size: 0.875rem; color: #374151; margin-bottom: 0.5rem; }
-
-  .no-form {
-    max-width: 540px; margin: 0 auto;
-    background: #fef2f2; border: 1.5px solid #fecaca;
-    border-radius: 12px; padding: 1.5rem; text-align: center;
-    color: #991b1b;
-  }
-</style>
-
-<div class="dl-hero">
-  <h2>📄 Application Form</h2>
-  <p>Download the official blank application form provided by the bursary committee</p>
-</div>
-
-{% if form_template %}
-  <div class="dl-card">
-    <h3>{{ form_template.title }}</h3>
-    <p class="meta">📅 Published: {{ form_template.uploaded_at|date:"d M Y" }}</p>
-    <a href="{% url 'applications:serve_form_file' form_template.pk %}" class="dl-btn">
-      ⬇ Download Form
-    </a>
+  <div class="page-hero hero-navy" style="margin-bottom:var(--spacing-6);">
+    <div class="page-hero-content">
+      <h1>📄 Application Form</h1>
+      <p>Download the official TUK Bursary application form, fill it in, and upload it when submitting your application.</p>
+    </div>
   </div>
 
-  <div class="steps-box">
-    <h4>📋 How to apply:</h4>
-    <ol>
-      <li>Download the form above and print or fill it digitally.</li>
-      <li>Complete all sections accurately.</li>
-      <li>Gather supporting documents (school ID, fee statement, guardian ID, etc.).</li>
-      <li>Go to <strong>Submit Application</strong> to upload the filled form.</li>
-      <li>Track your progress in the <strong>Application Status</strong> module.</li>
-    </ol>
+  {% if form_template %}
+  <div class="card" style="margin-bottom:var(--spacing-6);">
+    <div class="card-header">
+      <h3>{{ form_template.title }}</h3>
+      <span class="badge badge-verified">✓ Active</span>
+    </div>
+    <div class="card-body">
+      <p style="color:var(--gray-600); font-size:var(--font-size-sm); margin-bottom:var(--spacing-5);">
+        {% if form_template.description %}{{ form_template.description }}{% else %}This is the official TUK Bursary & Scholarship application form. Please fill in all sections clearly before uploading.{% endif %}
+      </p>
+      <p style="font-size:var(--font-size-xs); color:var(--gray-400); margin-bottom:var(--spacing-5);">
+        Last updated: {{ form_template.uploaded_at|date:"d M Y" }}
+      </p>
+      <a href="{% url 'applications:serve_form_file' pk=form_template.pk %}" class="btn btn-primary btn-lg" id="download-form-btn">
+        ⬇ Download Application Form
+      </a>
+    </div>
   </div>
-{% else %}
-  <div class="no-form">
-    <p style="font-size:1.5rem; margin-bottom:0.5rem;">🔔</p>
-    <strong>No form available yet.</strong>
-    <p style="margin: 0.5rem 0 0; font-size:0.875rem;">
-      The administrator has not yet uploaded the application form. Please check back later or contact the bursary office.
-    </p>
-  </div>
-{% endif %}
 
-<div style="text-align:center; margin-top:2rem;">
-  <a href="{% url 'home' %}" style="color:#6b7280; font-size:0.9rem; text-decoration:none;">← Back to Dashboard</a>
+  <div class="notice-box notice-gold">
+    <span class="notice-icon">💡</span>
+    <div class="notice-body">
+      <h4>How to complete the form</h4>
+      <p>
+        Download the form, fill in all required sections (personal details, family background, financial situation),
+        sign it, then scan or photograph it clearly. Upload the completed form when submitting your application.
+      </p>
+    </div>
+  </div>
+
+  {% else %}
+  <div class="empty-state">
+    <span class="empty-state-icon">📭</span>
+    <h3>No Form Available Yet</h3>
+    <p>The Bursary Office has not yet uploaded the current application form. Please check back soon or contact the Bursary Office directly.</p>
+  </div>
+  {% endif %}
+
+  <div style="display:flex; gap:var(--spacing-3); margin-top:var(--spacing-6); flex-wrap:wrap;">
+    <a href="{% url 'applications:submit' %}" class="btn btn-success" id="go-to-submit-btn">📝 Submit Application →</a>
+    <a href="{% url 'home' %}" class="back-link" style="margin-top:0.6rem;">← Back to Dashboard</a>
+  </div>
+
 </div>
 {% endblock %}

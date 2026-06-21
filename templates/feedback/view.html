@@ -1,15 +1,53 @@
 {% extends 'base.html' %}
+{% block title %}My Messages{% endblock %}
 
 {% block content %}
-<h2 class="text-2xl font-bold mb-4">Qualification Status</h2>
-{% if feedback %}
-<div class="bg-white p-4 rounded-lg shadow-md">
-    <p><strong>Status:</strong> {{ feedback.qualification_status }}</p>
-    <p><strong>Comments:</strong> {{ feedback.comments }}</p>
-    <p><strong>Reviewed by:</strong> {{ feedback.reviewed_by.username }}</p>
-    <p><strong>Reviewed at:</strong> {{ feedback.reviewed_at }}</p>
+<div class="page-wrapper" style="max-width:820px;">
+
+  <div class="page-hero hero-purple" style="margin-bottom:var(--spacing-6);">
+    <div class="page-hero-content">
+      <h1>💬 My Messages</h1>
+      <p>Feedback and communications from the TUK Bursary Office regarding your application.</p>
+    </div>
+  </div>
+
+  {% if feedbacks %}
+    {% for fb in feedbacks %}
+    <div class="card" style="margin-bottom:var(--spacing-4);" id="feedback-{{ fb.pk }}">
+      <div class="card-header">
+        <div style="display:flex; align-items:center; gap:var(--spacing-3);">
+          <span class="badge
+            {% if fb.feedback_type == 'approval_note' %}badge-verified
+            {% elif fb.feedback_type == 'rejection_reason' %}badge-rejected
+            {% elif fb.feedback_type == 'clarification' %}badge-unverified
+            {% else %}badge-navy
+            {% endif %}">
+            {{ fb.get_feedback_type_display }}
+          </span>
+          {% if fb.application %}
+            <span style="font-size:var(--font-size-xs); color:var(--gray-400);">Re: Application #{{ fb.application.pk }}</span>
+          {% endif %}
+        </div>
+        <span style="font-size:var(--font-size-xs); color:var(--gray-400);">
+          {{ fb.reviewed_at|date:"d M Y, H:i" }}
+          {% if fb.reviewed_by %} &bull; {{ fb.reviewed_by.full_name }}{% endif %}
+        </span>
+      </div>
+      <div class="card-body">
+        <p style="color:var(--gray-700); line-height:1.8; white-space:pre-wrap;">{{ fb.comments }}</p>
+      </div>
+    </div>
+    {% endfor %}
+  {% else %}
+    <div class="empty-state">
+      <span class="empty-state-icon">💬</span>
+      <h3>No Messages Yet</h3>
+      <p>You have no messages from the Bursary Office. Messages will appear here after the committee reviews your application.</p>
+      <a href="{% url 'applications:status' %}" class="btn btn-primary" id="check-app-status-btn">View Application Status</a>
+    </div>
+  {% endif %}
+
+  <a href="{% url 'home' %}" class="back-link">← Back to Dashboard</a>
+
 </div>
-{% else %}
-<p>No feedback available yet.</p>
-{% endif %}
 {% endblock %}

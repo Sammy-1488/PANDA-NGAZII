@@ -3,7 +3,7 @@ from pathlib import Path
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-SECRET_KEY = 'django-insecure-your-secret-key-change-this-in-production'
+SECRET_KEY = 'django-insecure-tuk-panda-ngazi-2026-change-in-production'
 
 DEBUG = True
 
@@ -19,31 +19,37 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
-    # Custom Modules (Registration, Application, Payment, Feedback)
+    # Custom Apps
     'accounts',
     'applications',
     'payments',
     'feedback',
-    'reports', # For Objective 5: Monitoring & Accountability 
+    'reports',
 
     # Third-party
-    'widget_tweaks', # Helps render Tailwind classes in Django forms
+    'widget_tweaks',
 ]
 
 AUTH_USER_MODEL = 'accounts.User'
 
-# Static files (CSS, JavaScript, Images)
+# Email-based authentication backend
+AUTHENTICATION_BACKENDS = [
+    'accounts.backends.EmailBackend',
+    'django.contrib.auth.backends.ModelBackend',
+]
+
+# Static files
 STATIC_URL = 'static/'
 STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
 
-# Media files (Scholarship Forms & Bank Receipts) 
+# Media files (uploaded documents, receipts, etc.)
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [os.path.join(BASE_DIR, 'templates')], # General templates folder
+        'DIRS': [os.path.join(BASE_DIR, 'templates')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -67,15 +73,9 @@ MIDDLEWARE = [
 ]
 
 LANGUAGE_CODE = 'en-us'
-TIME_ZONE = 'Africa/Nairobi' # Relevant for Kenyan school cycles [cite: 8]
+TIME_ZONE = 'Africa/Nairobi'
 USE_I18N = True
 USE_TZ = True
-
-SECRET_KEY = 'django-insecure-your-secret-key-change-this-in-production'
-
-DEBUG = True
-
-ALLOWED_HOSTS = ['*']
 
 DATABASES = {
     'default': {
@@ -84,14 +84,16 @@ DATABASES = {
     }
 }
 
-# For later Firebase integration
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.firebase',
-#         'NAME': 'panda-ngazi',
-#     }
-# }
+DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
+# Auth redirects
 LOGIN_URL = 'login'
 LOGIN_REDIRECT_URL = 'home'
 LOGOUT_REDIRECT_URL = 'login'
+
+# Email backend (console for development)
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+
+# TUK Email domain enforcement
+TUK_STUDENT_EMAIL_DOMAIN = 'students.tuk.ac.ke'
+TUK_STAFF_EMAIL_DOMAIN = 'tuk.ac.ke'

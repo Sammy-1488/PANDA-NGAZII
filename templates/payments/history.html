@@ -1,118 +1,107 @@
 {% extends 'base.html' %}
+{% block title %}Payment History{% endblock %}
 
 {% block content %}
-<style>
-  .hist-hero {
-    background: linear-gradient(135deg, #134e4a 0%, #0f766e 100%);
-    border-radius: 16px; padding: 2rem 2.5rem;
-    color: white; margin-bottom: 2rem;
-  }
-  .hist-hero h2 { font-size: 1.8rem; font-weight: 800; margin: 0 0 0.3rem; }
-  .hist-hero p  { opacity: 0.85; margin: 0; }
+<div class="page-wrapper">
 
-  .receipt-card {
-    background: #fff; border-radius: 14px;
-    border: 1.5px solid #e5e7eb;
-    box-shadow: 0 4px 16px rgba(0,0,0,0.05);
-    margin-bottom: 1.25rem; overflow: hidden;
-  }
-  .receipt-card-header {
-    display: flex; justify-content: space-between; align-items: center;
-    padding: 0.85rem 1.25rem; background: #f9fafb;
-    border-bottom: 1.5px solid #f3f4f6;
-  }
-  .receipt-card-header .title { font-size: 0.9rem; font-weight: 700; color: #1f2937; }
-  .receipt-card-header .date  { font-size: 0.78rem; color: #9ca3af; }
-
-  .verified-badge {
-    display: inline-flex; align-items: center; gap: 0.3rem;
-    font-size: 0.75rem; font-weight: 700; padding: 0.25rem 0.65rem; border-radius: 999px;
-  }
-  .badge-verified   { background: #d1fae5; color: #065f46; }
-  .badge-unverified { background: #fef3c7; color: #92400e; }
-
-  .receipt-card-body {
-    display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem;
-    padding: 1rem 1.25rem;
-  }
-  @media (max-width: 600px) { .receipt-card-body { grid-template-columns: 1fr 1fr; } }
-  .info-cell strong { display: block; font-size: 0.75rem; color: #6b7280; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.2rem; }
-  .info-cell span   { font-size: 0.9rem; color: #1f2937; font-weight: 600; }
-
-  .view-btn {
-    display: inline-flex; align-items: center; gap: 0.35rem;
-    background: #0f766e; color: #fff;
-    padding: 0.4rem 0.85rem; border-radius: 8px;
-    font-size: 0.82rem; font-weight: 600;
-    text-decoration: none; transition: background 0.15s;
-  }
-  .view-btn:hover { background: #134e4a; color:#fff; text-decoration:none; }
-
-  .empty-state { text-align:center; padding:3rem; color:#6b7280; }
-  .empty-state h3 { font-size:1.1rem; font-weight:700; margin-bottom:0.5rem; }
-</style>
-
-<div class="hist-hero">
-  <h2>📋 Bank Receipt History</h2>
-  <p>
-    {% if user.is_student %}Your uploaded bank deposit slips{% else %}All student payment receipts{% endif %}
-  </p>
-</div>
-
-{% if payments %}
-  {% for payment in payments %}
-  <div class="receipt-card">
-    <div class="receipt-card-header">
-      <div>
-        <span class="title">
-          {% if not user.is_student %}{{ payment.student.username }} — {% endif %}
-          Receipt #{{ payment.pk }}
-        </span>
-      </div>
-      <div style="display:flex; align-items:center; gap:0.75rem;">
-        <span class="date">{{ payment.uploaded_at|date:"d M Y, H:i" }}</span>
-        {% if payment.verified %}
-          <span class="verified-badge badge-verified">✅ Verified</span>
-        {% else %}
-          <span class="verified-badge badge-unverified">⏳ Pending Verification</span>
-        {% endif %}
-      </div>
-    </div>
-    <div class="receipt-card-body">
-      <div class="info-cell">
-        <strong>Amount Deposited</strong>
-        <span>KES {{ payment.amount|floatformat:2 }}</span>
-      </div>
-      <div class="info-cell">
-        <strong>Bank</strong>
-        <span>{{ payment.bank_name|default:"N/A" }}</span>
-      </div>
-      <div class="info-cell">
-        <strong>Receipt File</strong>
-        <a href="{{ payment.receipt.url }}" class="view-btn" target="_blank">📄 View Receipt</a>
-      </div>
-      {% if payment.application %}
-      <div class="info-cell">
-        <strong>Linked Application</strong>
-        <span>Ref #{{ payment.application.pk }}</span>
-      </div>
-      {% endif %}
+  <div class="page-hero hero-gold" style="margin-bottom:var(--spacing-6);">
+    <div class="page-hero-content">
+      <h1>💳 Payment History</h1>
+      <p>{% if user.is_student %}Your uploaded bank receipts and payment records{% else %}All student payment receipts — review and verify{% endif %}</p>
     </div>
   </div>
-  {% endfor %}
-{% else %}
+
+  {% if payments %}
+  <div class="table-wrapper">
+    <table class="data-table" id="payments-table">
+      <thead>
+        <tr>
+          <th>#</th>
+          {% if user.is_admin %}<th>Student</th>{% endif %}
+          <th>Application Ref</th>
+          <th>Amount (KES)</th>
+          <th>Bank</th>
+          <th>Uploaded</th>
+          <th>Receipt</th>
+          <th>Status</th>
+          {% if user.is_admin %}<th>Action</th>{% endif %}
+        </tr>
+      </thead>
+      <tbody>
+        {% for payment in payments %}
+        <tr id="payment-row-{{ payment.pk }}">
+          <td style="color:var(--gray-400); font-size:var(--font-size-xs);">#{{ payment.pk }}</td>
+          {% if user.is_admin %}
+          <td>
+            <div style="font-weight:600; font-size:var(--font-size-sm);">{{ payment.student.full_name }}</div>
+            <div style="font-size:var(--font-size-xs); color:var(--gray-400);">{{ payment.student.email }}</div>
+          </td>
+          {% endif %}
+          <td>
+            {% if payment.application %}
+              {% if user.is_admin %}
+                <a href="{% url 'applications:detail' pk=payment.application.pk %}" class="btn btn-ghost btn-sm">Ref #{{ payment.application.pk }}</a>
+              {% else %}
+                Ref #{{ payment.application.pk }}
+              {% endif %}
+            {% else %}
+              <span style="color:var(--gray-400);">—</span>
+            {% endif %}
+          </td>
+          <td style="font-weight:700; color:var(--tuk-navy);">{{ payment.amount|floatformat:2 }}</td>
+          <td>{{ payment.bank_name|default:"—" }}</td>
+          <td>
+            <div style="font-size:var(--font-size-sm);">{{ payment.uploaded_at|date:"d M Y" }}</div>
+            <div style="font-size:var(--font-size-xs); color:var(--gray-400);">{{ payment.uploaded_at|time:"H:i" }}</div>
+          </td>
+          <td>
+            {% if payment.receipt %}
+              <a href="{{ payment.receipt.url }}" class="btn btn-outline btn-sm" target="_blank" id="view-receipt-{{ payment.pk }}">📄 View</a>
+            {% else %}
+              <span style="color:var(--gray-400); font-size:var(--font-size-xs);">No file</span>
+            {% endif %}
+          </td>
+          <td>
+            {% if payment.verified %}
+              <span class="badge badge-verified">✓ Verified</span>
+            {% else %}
+              <span class="badge badge-unverified">⏳ Pending</span>
+            {% endif %}
+          </td>
+          {% if user.is_admin %}
+          <td>
+            <a href="{% url 'payments:verify' pk=payment.pk %}"
+               class="btn btn-sm {% if payment.verified %}btn-outline{% else %}btn-success{% endif %}"
+               id="verify-payment-{{ payment.pk }}"
+               onclick="return confirm('{% if payment.verified %}Mark as unverified?{% else %}Mark as verified?{% endif %}');">
+              {% if payment.verified %}Unverify{% else %}✓ Verify{% endif %}
+            </a>
+          </td>
+          {% endif %}
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  {% else %}
   <div class="empty-state">
-    <p style="font-size:2.5rem; margin-bottom:0.5rem;">🧾</p>
-    <h3>No Receipts Uploaded Yet</h3>
+    <span class="empty-state-icon">🧾</span>
+    <h3>No Receipts Found</h3>
+    <p>
+      {% if user.is_student %}
+        You haven't uploaded any bank receipts yet. Receipts can be uploaded once your funds are disbursed.
+      {% else %}
+        No student receipts have been uploaded yet.
+      {% endif %}
+    </p>
     {% if user.is_student %}
-      <p>Once your funds are disbursed, upload your bank deposit slip here.</p>
-    {% else %}
-      <p>No students have uploaded receipts yet.</p>
+      <a href="{% url 'applications:status' %}" class="btn btn-primary" id="check-status-btn">Check Application Status</a>
     {% endif %}
   </div>
-{% endif %}
+  {% endif %}
 
-<div style="margin-top:1rem;">
-  <a href="{% url 'home' %}" style="color:#6b7280; font-size:0.9rem; text-decoration:none;">← Back to Dashboard</a>
+  <a href="{% url 'home' %}" class="back-link">← Back to Dashboard</a>
+
 </div>
 {% endblock %}

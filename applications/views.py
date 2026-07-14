@@ -3,7 +3,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.http import FileResponse
 from django.utils import timezone
-from .forms import ApplicationForm, ApplicationReviewForm
+from .forms import ApplicationForm, ApplicationReviewForm, ApplicationFormTemplateForm
 from .models import Application, ApplicationFormTemplate
 
 
@@ -120,6 +120,26 @@ def application_detail(request, pk):
             reviewed.reviewed_by = request.user
             reviewed.reviewed_at = timezone.now()
             reviewed.save()
+
+            # Automatically create a Feedback log entry if feedback comment is provided
+            if reviewed.feedback_to_student:
+                from feedback.models import Feedback
+                fb_type = 'info'
+                if reviewed.status in ('approved', 'disbursed'):
+                    fb_type = 'approval_note'
+                elif reviewed.status == 'rejected':
+                    fb_type = 'rejection_reason'
+                elif reviewed.status == 'pending':
+                    fb_type = 'clarification'
+                
+                Feedback.objects.create(
+                    application=reviewed,
+                    student=reviewed.student,
+                    feedback_type=fb_type,
+                    comments=reviewed.feedback_to_student,
+                    reviewed_by=request.user,
+                )
+
             messages.success(
                 request,
                 f'Application #{pk} updated to <strong>{reviewed.get_status_display()}</strong>.'
@@ -136,3 +156,30 @@ def application_detail(request, pk):
         'step_index': STATUS_ORDER.index(application.status) if application.status in STATUS_ORDER else -1,
         'status_steps': STATUS_ORDER,
     })
+
+
+@login_required
+def upload_form_template(request):
+    """Admin: upload a new blank application form template."""
+    if not request.user.is_admin:
+        messages.error(request, 'Access denied.')
+        return redirect('home')
+
+    if request.method == 'POST':
+        form = ApplicationFormTemplateForm(request.POST, request.FILES)
+        if form.is_valid():
+            # Deactivate previous active templates
+            ApplicationFormTemplate.objects.filter(is_active=True).update(is_active=False)
+            
+            template = form.save(commit=False)
+            template.is_active = True
+            template.save()
+            
+            messages.success(request, '✅ New blank application form template uploaded successfully!')
+            return redirect('home')
+        else:
+            messages.error(request, 'Please correct the errors below.')
+    else:
+        form = ApplicationFormTemplateForm()
+
+    return render(request, 'applications/upload_template.html', {'form': form})

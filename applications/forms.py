@@ -1,5 +1,5 @@
 from django import forms
-from .models import Application
+from .models import Application, ApplicationFormTemplate
 
 
 class ApplicationForm(forms.ModelForm):
@@ -58,4 +58,24 @@ class ApplicationReviewForm(forms.ModelForm):
             'status': 'Application Status',
             'feedback_to_student': 'Message to Student',
             'admin_notes': 'Internal Admin Notes',
+        }
+
+
+class ApplicationFormTemplateForm(forms.ModelForm):
+    class Meta:
+        model = ApplicationFormTemplate
+        fields = ['title', 'description', 'form_file']
+        labels = {
+            'title': 'Form Title',
+            'description': 'Instructions / Description',
+            'form_file': 'Blank Form File (Word or PDF)',
+        }
+        widgets = {
+            'description': forms.Textarea(attrs={
+                'rows': 3,
+                'placeholder': 'Explain any details or deadline instructions for students...',
+            }),
+            'title': forms.TextInput(attrs={
+                'placeholder': 'e.g. TUK Bursary Application Form 2026/2027',
+            }),
         }

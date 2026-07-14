@@ -23,7 +23,6 @@
           <th>Message Preview</th>
           <th>Sent By</th>
           <th>Date</th>
-          {% if user.is_admin %}<th>Action</th>{% endif %}
         </tr>
       </thead>
       <tbody>
@@ -54,13 +53,6 @@
           </td>
           <td style="font-size:var(--font-size-sm);">{{ fb.reviewed_by.full_name|default:"System" }}</td>
           <td style="font-size:var(--font-size-xs); color:var(--gray-500);">{{ fb.reviewed_at|date:"d M Y" }}</td>
-          {% if user.is_admin %}
-          <td>
-            {% if fb.application %}
-            <a href="{% url 'feedback:provide' application_id=fb.application.pk %}" class="btn btn-outline btn-sm" id="reply-feedback-{{ fb.pk }}">Reply</a>
-            {% endif %}
-          </td>
-          {% endif %}
         </tr>
         {% endfor %}
       </tbody>
@@ -78,7 +70,7 @@
   </div>
   {% endif %}
 
-  <a href="{% url 'home' %}" class="back-link">← Back to Dashboard</a>
+  <a href="{% url 'home' %}" class="back-link">Back to Dashboard</a>
 
 </div>
 {% endblock %}

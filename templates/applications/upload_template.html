@@ -1,0 +1,78 @@
+{% extends 'base.html' %}
+{% block title %}Upload Blank Application Form Template{% endblock %}
+
+{% block content %}
+<div class="page-wrapper" style="max-width:680px;">
+
+  <div class="page-hero hero-maroon" style="margin-bottom:var(--spacing-6);">
+    <div class="page-hero-content">
+      <h1>📄 Blank Form Templates</h1>
+      <p>Upload new blank bursary application forms (DOCX/PDF) for students to download.</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header"><h3>📁 Upload Form Template</h3></div>
+    <div class="card-body">
+      <form method="post" enctype="multipart/form-data" id="upload-template-form" novalidate>
+        {% csrf_token %}
+
+        <div class="form-group">
+          <label class="form-label" for="{{ form.title.id_for_label }}">
+            Form Title <span class="required">*</span>
+          </label>
+          <input type="text" name="title" id="{{ form.title.id_for_label }}"
+            class="form-control" placeholder="e.g. TUK Bursary Application Form 2026/2027"
+            value="{{ form.title.value|default:'' }}" required>
+          {% if form.title.errors %}<ul class="errorlist">{% for e in form.title.errors %}<li>{{ e }}</li>{% endfor %}</ul>{% endif %}
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="{{ form.description.id_for_label }}">
+            Instructions / Description
+          </label>
+          <textarea name="description" id="{{ form.description.id_for_label }}"
+            class="form-control" rows="3"
+            placeholder="Explain any details or deadline instructions for students...">{{ form.description.value|default:'' }}</textarea>
+          {% if form.description.errors %}<ul class="errorlist">{% for e in form.description.errors %}<li>{{ e }}</li>{% endfor %}</ul>{% endif %}
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Blank Form File <span class="required">*</span></label>
+          <div class="file-drop-zone" id="file-drop-zone">
+            <input type="file" name="form_file" id="{{ form.form_file.id_for_label }}"
+              accept=".pdf,.doc,.docx" required>
+            <span class="drop-icon">📄</span>
+            <p class="drop-text" id="filename-display">Click to upload or drag & drop the blank form here</p>
+            <p class="drop-hint">Accepted: DOCX, DOC, PDF</p>
+          </div>
+          {% if form.form_file.errors %}<ul class="errorlist">{% for e in form.form_file.errors %}<li>{{ e }}</li>{% endfor %}</ul>{% endif %}
+        </div>
+
+        <div style="display:flex; gap:var(--spacing-3); align-items:center; margin-top:var(--spacing-5);">
+          <button type="submit" class="btn btn-maroon btn-lg" id="upload-template-submit-btn">
+            💾 Save & Activate Template
+          </button>
+          <a href="{% url 'home' %}" class="btn btn-outline">Cancel</a>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <a href="{% url 'home' %}" class="back-link">Back to Dashboard</a>
+
+</div>
+
+<script>
+  const fileInput = document.getElementById('{{ form.form_file.id_for_label }}');
+  const filenameDisplay = document.getElementById('filename-display');
+  if (fileInput) {
+    fileInput.addEventListener('change', function () {
+      if (this.files.length > 0) {
+        filenameDisplay.textContent = '✅ Selected: ' + this.files[0].name;
+        filenameDisplay.style.color = 'var(--success)';
+      }
+    });
+  }
+</script>
+{% endblock %}

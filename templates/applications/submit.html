@@ -125,10 +125,10 @@
     </div>
 
     <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:1rem;">
+      <a href="{% url 'home' %}" class="back-link" style="margin-top:0;">Back to Dashboard</a>
       <button type="submit" class="btn btn-success btn-lg" id="submit-application-btn">
         {% if existing %}📤 Update Application{% else %}📤 Submit Application{% endif %}
       </button>
-      <a href="{% url 'home' %}" class="back-link">Back to Dashboard</a>
     </div>
   </form>
 

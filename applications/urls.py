@@ -9,4 +9,5 @@ urlpatterns = [
     path('submit/', views.submit_application, name='submit'),
     path('status/', views.application_status, name='status'),
     path('detail/<int:pk>/', views.application_detail, name='detail'),
+    path('upload-template/', views.upload_form_template, name='upload_template'),
 ]

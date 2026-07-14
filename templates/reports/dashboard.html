@@ -11,6 +11,20 @@
     </div>
   </div>
 
+  <!-- Export Section -->
+  <div class="card" style="margin-bottom:var(--spacing-6);">
+    <div class="card-body" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:1rem; padding:var(--spacing-4) var(--spacing-6);">
+      <div>
+        <h3 style="margin-bottom:0.25rem; font-size:var(--font-size-base);">Download Data Reports</h3>
+        <p style="color:var(--gray-500); font-size:var(--font-size-sm); margin:0;">Export complete tables as CSV files for administrative audit and accountability.</p>
+      </div>
+      <div style="display:flex; gap:var(--spacing-3);">
+        <a href="{% url 'reports:export_applications' %}" class="btn btn-primary" id="btn-export-apps">📥 Export Applications</a>
+        <a href="{% url 'reports:export_payments' %}" class="btn btn-gold" id="btn-export-payments">📥 Export Payments</a>
+      </div>
+    </div>
+  </div>
+
   <!-- Application Stats -->
   <h2 style="font-size:var(--font-size-lg); font-weight:700; color:var(--gray-700); margin-bottom:var(--spacing-4);">Application Overview</h2>
   <div class="stat-cards" style="margin-bottom:var(--spacing-8);">
@@ -144,7 +158,7 @@
     {% endif %}
   </div>
 
-  <a href="{% url 'home' %}" class="back-link">← Back to Dashboard</a>
+  <a href="{% url 'home' %}" class="back-link">Back to Dashboard</a>
 
 </div>
 {% endblock %}

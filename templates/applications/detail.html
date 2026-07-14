@@ -171,20 +171,13 @@
               💾 Save Review
             </button>
           </form>
-
-          <hr class="divider">
-
-          <!-- Send Feedback -->
-          <a href="{% url 'feedback:provide' application_id=application.pk %}" class="btn btn-outline" style="width:100%; text-align:center;" id="send-feedback-btn">
-            💬 Send Feedback Message
-          </a>
         </div>
       </div>
     </div>
 
   </div>
 
-  <a href="{% url 'applications:status' %}" class="back-link">← Back to All Applications</a>
+  <a href="{% url 'applications:status' %}" class="back-link">Back to All Applications</a>
 
 </div>
 

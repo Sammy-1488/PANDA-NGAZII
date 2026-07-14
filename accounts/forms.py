@@ -68,6 +68,53 @@ class StudentRegistrationForm(UserCreationForm):
         return user
 
 
+TUK_STAFF_DOMAIN = getattr(settings, 'TUK_STAFF_EMAIL_DOMAIN', 'tuk.ac.ke')
+
+
+class AdminRegistrationForm(UserCreationForm):
+    first_name = forms.CharField(max_length=100, label='First Name')
+    last_name = forms.CharField(max_length=100, label='Last Name')
+    email = forms.EmailField(
+        label='TUK Staff/Admin Email',
+        help_text=f'Must be your official TUK staff email (e.g. name@{TUK_STAFF_DOMAIN})',
+    )
+    phone = forms.CharField(max_length=15, required=False, label='Phone Number')
+
+    class Meta:
+        model = User
+        fields = ('first_name', 'last_name', 'email', 'phone', 'password1', 'password2')
+
+    def clean_email(self):
+        email = self.cleaned_data['email'].lower().strip()
+        if not email.endswith(f'@{TUK_STAFF_DOMAIN}'):
+            raise forms.ValidationError(
+                f'Only TUK staff/admin emails are accepted (@{TUK_STAFF_DOMAIN}).'
+            )
+        if User.objects.filter(email__iexact=email).exists():
+            raise forms.ValidationError('An account with this email already exists.')
+        return email
+
+    def save(self, commit=True):
+        user = super().save(commit=False)
+        user.email = self.cleaned_data['email']
+        user.first_name = self.cleaned_data['first_name']
+        user.last_name = self.cleaned_data['last_name']
+        user.phone = self.cleaned_data.get('phone', '')
+        user.is_admin = True
+        user.is_staff = True
+        # Auto-generate username from email (before the @)
+        base_username = self.cleaned_data['email'].split('@')[0]
+        username = base_username
+        counter = 1
+        while User.objects.filter(username=username).exists():
+            username = f"{base_username}{counter}"
+            counter += 1
+        user.username = username
+        if commit:
+            user.save()
+        return user
+
+
 class LoginForm(forms.Form):
     email = forms.EmailField(
         label='TUK Email Address',

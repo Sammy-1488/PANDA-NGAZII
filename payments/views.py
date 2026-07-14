@@ -18,7 +18,7 @@ def upload_payment(request):
     if not disbursed_app:
         messages.warning(
             request,
-            'You can only upload a bank receipt after your application has been '
+            'You can only upload a school fees payment receipt after your application has been '
             'approved and funds have been disbursed. Please check your application status.'
         )
         return redirect('applications:status')
@@ -35,7 +35,7 @@ def upload_payment(request):
             payment.student = request.user
             payment.application = disbursed_app
             payment.save()
-            messages.success(request, '✅ Your bank receipt has been uploaded successfully!')
+            messages.success(request, '✅ Your fees payment receipt has been uploaded successfully!')
             return redirect('payments:history')
         else:
             messages.error(request, 'Please correct the errors below.')

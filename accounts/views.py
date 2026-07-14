@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import login, authenticate, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-from .forms import StudentRegistrationForm, LoginForm, StudentProfileUpdateForm
+from .forms import StudentRegistrationForm, AdminRegistrationForm, LoginForm, StudentProfileUpdateForm
 from .models import StudentProfile
 
 
@@ -21,6 +21,23 @@ def register_student(request):
     else:
         form = StudentRegistrationForm()
     return render(request, 'accounts/register_student.html', {'form': form})
+
+
+def register_admin(request):
+    if request.user.is_authenticated:
+        return redirect('home')
+    if request.method == 'POST':
+        form = AdminRegistrationForm(request.POST)
+        if form.is_valid():
+            user = form.save()
+            login(request, user, backend='accounts.backends.EmailBackend')
+            messages.success(request, f'Welcome, {user.first_name}! Your administrator account has been created successfully.')
+            return redirect('home')
+        else:
+            messages.error(request, 'Please correct the errors below.')
+    else:
+        form = AdminRegistrationForm()
+    return render(request, 'accounts/register_admin.html', {'form': form})
 
 
 def login_view(request):

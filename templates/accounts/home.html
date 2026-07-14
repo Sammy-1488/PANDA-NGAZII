@@ -41,72 +41,129 @@
   </div>
   {% endif %}
 
-  <!-- Module Cards -->
-  <div class="modules-grid">
+  <style>
+    .dashboard-container {
+      display: grid;
+      grid-template-columns: 220px 1fr;
+      gap: var(--spacing-6);
+      align-items: stretch;
+      margin-top: var(--spacing-6);
+    }
+    .dashboard-sidebar {
+      display: flex;
+      flex-direction: column;
+    }
+    .dashboard-sidebar .card {
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+    }
+    .dashboard-sidebar .card-body {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: var(--spacing-2);
+    }
+    .dashboard-main .modules-grid {
+      grid-template-columns: repeat(4, 1fr);
+      margin-bottom: 0;
+    }
+    @media (max-width: 1024px) {
+      .dashboard-main .modules-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+    @media (max-width: 900px) {
+      .dashboard-container {
+        grid-template-columns: 1fr;
+      }
+      .dashboard-sidebar {
+        order: 2;
+      }
+      .dashboard-main {
+        order: 1;
+      }
+      .dashboard-sidebar .card {
+        height: auto;
+      }
+    }
+    @media (max-width: 580px) {
+      .dashboard-main .modules-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
 
-    <!-- 1. Download Form -->
-    <div class="module-card card-navy">
-      <div class="module-accent" style="background: linear-gradient(90deg, var(--tuk-navy), #3b82f6);"></div>
-      <div class="module-icon">📄</div>
-      <h3>Application Form</h3>
-      <p>Download the official blank bursary application form, fill it in, and upload it back through the Submit Application module.</p>
-      <div class="module-card-footer">
-        <a href="{% url 'applications:download_form' %}" class="btn btn-primary btn-sm" id="btn-download-form">⬇ Download Form</a>
+  <div class="dashboard-container">
+    <!-- Left Column: Quick Links (Vertical & Stretched) -->
+    <div class="dashboard-sidebar">
+      <div class="card" style="width: 100%;">
+        <div class="card-body">
+          <span style="font-size: var(--font-size-sm); font-weight: 700; color: var(--gray-600); margin-bottom: var(--spacing-2); padding-left: var(--spacing-2);">Quick links</span>
+          <a href="{% url 'profile' %}" class="btn btn-ghost btn-sm" id="ql-profile" style="justify-content: flex-start; width: 100%;">👤 My Profile</a>
+          <a href="{% url 'feedback:view' %}" class="btn btn-ghost btn-sm" id="ql-messages" style="justify-content: flex-start; width: 100%;">💬 My Messages</a>
+          <a href="{% url 'payments:history' %}" class="btn btn-ghost btn-sm" id="ql-payment-history" style="justify-content: flex-start; width: 100%;">📋 Payment History</a>
+          <a href="{% url 'about' %}" class="btn btn-ghost btn-sm" id="ql-about" style="justify-content: flex-start; width: 100%;">ℹ️ About / Help</a>
+        </div>
       </div>
     </div>
 
-    <!-- 2. Submit Application -->
-    <div class="module-card card-green">
-      <div class="module-accent" style="background: linear-gradient(90deg, var(--success), #4ade80);"></div>
-      <div class="module-icon">📝</div>
-      <h3>Submit Application</h3>
-      <p>Upload your completed application form along with supporting documents — fee statement, national ID, and school letter.</p>
-      <div class="module-card-footer">
-        <a href="{% url 'applications:submit' %}" class="btn btn-success btn-sm" id="btn-submit-app">
-          {% if latest_app %}📤 Update Application{% else %}📤 Submit Now{% endif %}
-        </a>
-        {% if latest_app %}
-          <span class="badge badge-{{ latest_app.status }}">{{ latest_app.get_status_display }}</span>
-        {% endif %}
+    <!-- Right Column: Module Cards -->
+    <div class="dashboard-main">
+      <div class="modules-grid" style="margin-bottom: 0;">
+        <!-- 1. Download Form -->
+        <div class="module-card card-navy">
+          <div class="module-accent" style="background: linear-gradient(90deg, var(--tuk-navy), #3b82f6);"></div>
+          <div class="module-icon">📄</div>
+          <h3>Application Form</h3>
+          <p>Download the official blank bursary application form, fill it in, and upload it back through the Submit Application module.</p>
+          <div class="module-card-footer">
+            <a href="{% url 'applications:download_form' %}" class="btn btn-primary btn-sm" id="btn-download-form">⬇ Download Form</a>
+          </div>
+        </div>
+
+        <!-- 2. Submit Application -->
+        <div class="module-card card-green">
+          <div class="module-accent" style="background: linear-gradient(90deg, var(--success), #4ade80);"></div>
+          <div class="module-icon">📝</div>
+          <h3>Submit Application</h3>
+          <p>Upload your completed application form along with supporting documents — fee statement, national ID, and school letter.</p>
+          <div class="module-card-footer">
+            <a href="{% url 'applications:submit' %}" class="btn btn-success btn-sm" id="btn-submit-app">
+              {% if latest_app %}📤 Update Application{% else %}📤 Submit Now{% endif %}
+            </a>
+            {% if latest_app %}
+              <span class="badge badge-{{ latest_app.status }}">{{ latest_app.get_status_display }}</span>
+            {% endif %}
+          </div>
+        </div>
+
+        <!-- 3. Application Status -->
+        <div class="module-card card-purple">
+          <div class="module-accent" style="background: linear-gradient(90deg, #7c3aed, #a855f7);"></div>
+          <div class="module-icon">📊</div>
+          <h3>Track Application</h3>
+          <p>Monitor your application progress through the full pipeline: submission → qualification → approval → disbursement.</p>
+          <div class="module-card-footer">
+            <a href="{% url 'applications:status' %}" class="btn btn-sm" style="background:#7c3aed;color:#fff;" id="btn-view-status">View Status →</a>
+          </div>
+        </div>
+
+        <!-- 4. Upload School Receipt -->
+        <div class="module-card card-gold">
+          <div class="module-accent" style="background: linear-gradient(90deg, var(--tuk-gold), var(--tuk-gold-light));"></div>
+          <div class="module-icon">🧾</div>
+          <h3>Upload School Receipt</h3>
+          <p>After the bursary is credited to your fees account, upload the payment receipt from the Finance Office to complete the process.</p>
+          <div class="module-card-footer">
+            {% if latest_app and latest_app.status == 'disbursed' %}
+              <a href="{% url 'payments:upload' %}" class="btn btn-gold btn-sm" id="btn-upload-receipt">⬆ Upload Receipt</a>
+            {% else %}
+              <span style="font-size:var(--font-size-xs); color:var(--gray-400);">⏳ Available after disbursement</span>
+            {% endif %}
+          </div>
+        </div>
       </div>
-    </div>
-
-    <!-- 3. Application Status -->
-    <div class="module-card card-purple">
-      <div class="module-accent" style="background: linear-gradient(90deg, #7c3aed, #a855f7);"></div>
-      <div class="module-icon">📊</div>
-      <h3>Track Application</h3>
-      <p>Monitor your application progress through the full pipeline: submission → qualification → approval → disbursement.</p>
-      <div class="module-card-footer">
-        <a href="{% url 'applications:status' %}" class="btn btn-sm" style="background:#7c3aed;color:#fff;" id="btn-view-status">View Status →</a>
-      </div>
-    </div>
-
-    <!-- 4. Upload Bank Receipt -->
-    <div class="module-card card-gold">
-      <div class="module-accent" style="background: linear-gradient(90deg, var(--tuk-gold), var(--tuk-gold-light));"></div>
-      <div class="module-icon">🧾</div>
-      <h3>Upload Bank Receipt</h3>
-      <p>After receiving your cheque and depositing it, upload your bank deposit slip here to complete the process.</p>
-      <div class="module-card-footer">
-        {% if latest_app and latest_app.status == 'disbursed' %}
-          <a href="{% url 'payments:upload' %}" class="btn btn-gold btn-sm" id="btn-upload-receipt">⬆ Upload Receipt</a>
-        {% else %}
-          <span style="font-size:var(--font-size-xs); color:var(--gray-400);">⏳ Available after disbursement</span>
-        {% endif %}
-      </div>
-    </div>
-
-  </div>
-
-  <!-- Quick links row -->
-  <div class="card">
-    <div class="card-body" style="display:flex; flex-wrap:wrap; gap:var(--spacing-3); align-items:center;">
-      <span style="font-size:var(--font-size-sm); font-weight:600; color:var(--gray-600);">Quick links:</span>
-      <a href="{% url 'payments:history' %}" class="btn btn-ghost btn-sm" id="ql-payment-history">📋 Payment History</a>
-      <a href="{% url 'feedback:view' %}" class="btn btn-ghost btn-sm" id="ql-messages">💬 My Messages</a>
-      <a href="{% url 'profile' %}" class="btn btn-ghost btn-sm" id="ql-profile">👤 My Profile</a>
-      <a href="{% url 'about' %}" class="btn btn-ghost btn-sm" id="ql-about">ℹ️ About / Help</a>
     </div>
   </div>
 
@@ -159,6 +216,16 @@
       <p>View all feedback messages sent to students. Communicate application decisions and clarification requests.</p>
       <div class="module-card-footer">
         <span class="btn btn-sm" style="background:#7c3aed;color:#fff;">Open →</span>
+      </div>
+    </a>
+
+    <a href="{% url 'applications:upload_template' %}" class="module-card card-gold" id="admin-manage-templates">
+      <div class="module-accent" style="background: linear-gradient(90deg, var(--tuk-gold), #f59e0b);"></div>
+      <div class="module-icon">📄</div>
+      <h3>Blank Form Templates</h3>
+      <p>Upload new blank bursary application forms (DOCX/PDF) for students to download on their dashboard.</p>
+      <div class="module-card-footer">
+        <span class="btn btn-gold btn-sm">Upload Template →</span>
       </div>
     </a>
   </div>
